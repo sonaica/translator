@@ -1,3 +1,4 @@
 ### Developers:
-### Gaisina Sofia (ssupersonicc)
-### Grigoryan Sergey
+
+Gaisina Sofia (ssupersonicc)
+Grigoryan Sergey
