@@ -1,5 +1,5 @@
 ### Developers:
 
-Gaisina Sofia (ssupersonicc)
+Gaisina Sofia @ssupersonicc
 
-Grigoryan Sergey
+Grigoryan Sergey @sir-greg
