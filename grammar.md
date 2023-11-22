@@ -20,7 +20,7 @@
 ```
 <Function definition> ::= fun <Name> “(“ <Function parameters> “)” -> <Type>  ‘{‘ <Operator> ‘}’
 
-<Function parameters> ::= <Type> <Name> | <Type> <Name>, <Argument list>
+<Function parameters> ::= <Type> <Name> | <Type> <Name>, <Function parameters>
 
 <Function call> ::= <Name>(<Argument list>);
 
@@ -59,6 +59,8 @@
 ### Expression
 ```
 <Expression> ::= <Arithmetic expression> | <Logical expression> | <Comparison> | <Function call> | <Assignment> | <Expression>, <Expression> | <Variable>
+
+<Expression operator> ::= <Expression> ;
 ```
 ### Arithmetic
 ```
@@ -81,6 +83,9 @@
 <Mul> ::= * | / | %
 
 <Sum> ::= + | -
+
+<Unary> ::= + | - | ++ | -- | ~ | new | delete | & | *
+// add , arithmetic and logic
 ```
 ### Assignment
 ```
@@ -116,11 +121,11 @@
 ```
 ### Operator
 ```
-<Operator>::= ‘{‘ { <Operator> } ‘}’ | <Operator>; <Operator> | <If> | <For> | <While> | <Input> | <Output> | <Expression> | <Variable Initialization> | <Match>
+<Operator>::= ‘{‘ { <Operator> } ‘}’ | <Operator>; <Operator> | <If> | <For> | <While> | <Input> | <Output> | <Expression operator> | <Variable Initialization> | <Match>
 ```
 ### Conditional operator
 ```
-<If> :: if (<Expression>) <Operator> else <Operator>
+<If> :: if (<Expression>) <Operator> [ else <Operator> ]
 ```
 ### Cycles
 ```
@@ -159,9 +164,5 @@
 ### Match
 ```
 <Match> ::= match <Name> ‘{‘ {<Expression> => <Operator>;} ‘}’
-```
-
-```
-//<Unary> ::= + | - | ++ | -- | ~ | new | delete | & | *
 ```
 
