@@ -64,10 +64,10 @@
 ```
 ### Arithmetic
 ```
-
-<Arithmetic term> ::= <Arithmetic literal> | <Variable>
-
+<Boolean literal> ::= false | true
 <Arithmetic literal> ::= <Signed number> | <Signed number>.<Unsigned number>
+
+<Arithmetic term> ::= <Arithmetic literal> | <Variable> | <Boolean term>
 
 <Or term> ::= <Arithmetic term><Or><Or term> | <Arithmetic term>
 <Xor term> ::= <Or term><Xor><Xor term> | <Or term>
@@ -92,10 +92,6 @@
 <Comparison> ::= <Expression> <Comparison operators> <Expression>
 
 <Comparison operators> ::= > | < | >= | <= | == | != 
-```
-### Logic
-```
-<Boolean literal> ::= false | true
 ```
 ### Operator
 ```
