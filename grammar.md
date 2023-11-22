@@ -65,29 +65,18 @@
 ### Arithmetic
 ```
 
-<Arithmetic Term> ::= <Arithmetic literal> | <Variable>
+<Arithmetic term> ::= <Arithmetic literal> | <Variable>
 
 <Arithmetic literal> ::= <Signed number> | <Signed number>.<Unsigned number>
 
-<Sum Term> ::= <Arithmetic Term><Sum><Sum Term> | <Arithmetic Term>
-
-<Xor Term> ::= <Sum Term><Xor><Xor Term> | <Sum Term>
-
-<Mul Term> ::= <Xor Term><Mul><Mul Term> | <Xor Term>
-
-<Power Term> ::= <Mul Term><Power><Power Term> | <Mul Term>
-
-<Unary Term> ::= <Unary><Power Term> | <Power Term>
-
-<Arithmetic expression> ::= <Unary Term>
-
-<Power> ::= **
-
-<Mul> ::= * | / | % | &
-
-<Sum> ::= + | - | '|'
-
-<Xor> ::= ^
+<Or term> ::= <Arithmetic term><Or><Or term> | <Arithmetic term>
+<Xor term> ::= <Or term><Xor><Xor term> | <Or term>
+<And term> ::= <Xor term><And><And term> | <Xor term>
+<Power term> ::= <And term><Power><Power term> | <And term>
+<Sum term> ::= <Power term><Sum><Sum term> | <Power term>
+<Mul term> ::= <Sum term><Mul><Mul term> | <Sum term>
+<Unary term> ::= <Unary><Mul term> | <Mul term>
+<Arithmetic expression> ::= <Unary term>
 
 <Unary> ::= + | - | ++ | -- | ~ | new | delete | & | * | ~
 // add , arithmetic and logic
