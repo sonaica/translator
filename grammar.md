@@ -77,7 +77,7 @@
 
 <Power Term> ::= <Mul Term><Power><Power Term> | <Mul Term>
 
-<Unary Term> ::= <Unary Term><Power Term> | <Power Term>
+<Unary Term> ::= <Unary><Power Term> | <Power Term>
 
 <Arithmetic expression> ::= <Unary Term>
 
