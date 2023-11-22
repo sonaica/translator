@@ -14,7 +14,7 @@
 
 <Definition> ::= <String> <String>
 
-<Global statement> ::= <Function definition> | <Struct definition> | <Variable Initialization>
+<Global statement> ::= <Function definition> | <Struct definition> | <Variable Creation>
 ```
 ### Functions
 ```
@@ -42,7 +42,7 @@
 
 <Variable>::= <Name> | <Array Indexation>
 
-<Letter> ::= [[a-z] | [A-Z] | <Special symbol> ]
+<Letter> ::= [a-z] | [A-Z] | <Special symbol>
 
 <Special symbol> ::= @ | # | £ | $ | _
 
@@ -62,7 +62,7 @@
 ```
 ### Expression
 ```
-<Expression> ::= <Arithmetic expression> | <Logical expression> | <Comparison> | <Function call> | <Assignment> | <Expression>, <Expression> | <Variable>
+<Expression> ::= <Arithmetic expression> | <Comparison> | <Function call> | <Assignment> | <Expression>, <Expression> | <Variable>
 
 <Expression operator> ::= <Expression> ;
 ```
