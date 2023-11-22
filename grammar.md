@@ -64,27 +64,32 @@
 ```
 ### Arithmetic
 ```
-<Arithmetic expression> ::= <Main arithmetic term>
 
-<Main arithmetic term> ::= <Power term> <Power> <Power term> | <Power term>
-
-<Arithmetic Term> ::= <Arithmetic literal>
+<Arithmetic Term> ::= <Arithmetic literal> | <Variable>
 
 <Arithmetic literal> ::= <Signed number> | <Signed number>.<Unsigned number>
 
-<Power term> ::= <Mul term> <Mul> <Mul term> | <Mul term>
+<Sum Term> ::= <Arithmetic Term><Sum><Sum Term> | <Arithmetic Term>
 
-<Mul term> ::= <Sum term> <Sum> <Sum term> | <Sum term>
+<Xor Term> ::= <Sum Term><Xor><Xor Term> | <Sum Term>
 
-<Sum term> ::= <Unary><Arithmetic Term> | <Arithmetic Term>
+<Mul Term> ::= <Xor Term><Mul><Mul Term> | <Xor Term>
+
+<Power Term> ::= <Mul Term><Power><Power Term> | <Mul Term>
+
+<Unary Term> ::= <Unary Term><Power Term> | <Power Term>
+
+<Arithmetic expression> ::= <Unary Term>
 
 <Power> ::= **
 
-<Mul> ::= * | / | %
+<Mul> ::= * | / | % | &
 
-<Sum> ::= + | -
+<Sum> ::= + | - | '|'
 
-<Unary> ::= + | - | ++ | -- | ~ | new | delete | & | *
+<Xor> ::= ^
+
+<Unary> ::= + | - | ++ | -- | ~ | new | delete | & | * | ~
 // add , arithmetic and logic
 ```
 ### Assignment
@@ -101,23 +106,7 @@
 ```
 ### Logic
 ```
-<Logical expression> ::= <Main logical term>
-
-<Main logical term> ::= <And term> | <And term> <And> <And term>
-
-<And term> ::= <Or term> | <Or term> <Or> <Or term>
-
-<Or term> ::= <Boolean term> | <Not> <Boolean term>
-
-<Boolean term> ::= <Boolean literal>
-
 <Boolean literal> ::= false | true
-
-<And> ::= &
-
-<Or> := |
-
-<Not> := !
 ```
 ### Operator
 ```
