@@ -28,7 +28,7 @@
 ```
 ### Structures
 ```
-<Struct definition> ::= struct <Name>  ‘{‘ <Function definition> | <Variable Initialization> ‘}’ { <Name>, } <Name>;
+<Struct definition> ::= struct <Name>  ‘{‘ <Function definition> | <Variable Creation> ‘}’ { <Name>, } <Name>;
 
 <Struct member> ::= <Name>.(<Name>|<Function call>)
 ```
@@ -48,7 +48,11 @@
 
 <Type> ::= void | int | double | bool
 
-<Variable Initialization> ::= <Type> {<Name>, } <Name>;
+<Variable Creation> ::= <Variable Definition> | <Variable Initialization>
+
+<Variable Definition> ::= <Type> {<Name>, } <Name>;
+
+<Variable Initialization> ::= <Type> {<Name> ::= <Expression>, } <Name> ::= <Expression>;
 
 <Sign> ::= + | -
 
@@ -102,7 +106,7 @@
 ```
 ### Operator
 ```
-<Operator>::= ‘{‘ { <Operator> } ‘}’ | <Operator>; <Operator> | <If> | <For> | <While> | <Input> | <Output> | <Expression operator> | <Variable Initialization> | <Match>
+<Operator>::= ‘{‘ { <Operator> } ‘}’ | <Operator>; <Operator> | <If> | <For> | <While> | <Input> | <Output> | <Expression operator> | <Variable Creation> | <Match>
 ```
 ### Conditional operator
 ```
