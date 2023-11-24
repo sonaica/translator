@@ -108,7 +108,7 @@
 ```
 <Assignment> ::= <Variable> <Assignment operator> <Expression>
 
-<Assignment operator> ::= = | <<= | >>= | += | ->= | -= | *= | **= | /= | //= | ^= | &= | |= | %=
+<Assignment operator> ::= = | <<= | >>= | += | -= | *= | **= | /= | //= | ^= | &= | |= | %=
 ```
 ### Comparison
 ```
