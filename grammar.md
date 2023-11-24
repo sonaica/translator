@@ -70,8 +70,6 @@
 ```
 <Arithmetic expression> ::= <Unary term>
 
-<Unary term> ::= <Unary><Mul term> | <Mul term>
-
 <Unary> ::= + | - | ++ | -- | ~ | new | delete | & | * | ~
 
 <Mul> ::= *
@@ -86,17 +84,23 @@
 
 <Or> ::= '|' | or
 
-<Mul term> ::= <Sum term><Mul><Mul term> | <Sum term>
+<Shift> ::= << | >>
 
-<Sum term> ::= <Power term><Sum><Sum term> | <Power term>
+<Unary term> ::= <Unary><Unary term> | <Power term>
 
-<Power term> ::= <And term><Power><Power term> | <And term>
+<Power term> ::= <Power term><Power><Power term> | <Mul term>
 
-<And term> ::= <Xor term><And><And term> | <Xor term>
+<Mul term> ::= <Mul term><Mul><Mul term> | <Sum term>
 
-<Xor term> ::= <Or term><Xor><Xor term> | <Or term>
+<Sum term> ::= <Sum term><Sum><Sum term> | <Shift term>
 
-<Or term> ::= <Arithmetic term><Or><Or term> | <Arithmetic term>
+<Shift term> ::= <Shift term><Shift><Shift term> | <And term>
+
+<And term> ::= <And term><And><And term> | <Xor term>
+
+<Xor term> ::= <Xor term><Xor><Xor term> | <Or term>
+
+<Or term> ::= <Or term><Or><Or term> | <Arithmetic term>
 
 <Arithmetic term> ::= <Arithmetic literal> | <Variable> | <Boolean literal>
 
