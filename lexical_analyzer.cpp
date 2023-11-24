@@ -181,6 +181,11 @@ Verdict FSM(std::vector<char> &text, std::vector<Lexem> &lexems) {
                     current_lexem += cur;
                     ++i;
                     state = States::Literal_Double;
+                } else if (is_letter(cur)) {
+                    verdict_return.is_error = true;
+                    verdict_return.line_number = lines;
+                    verdict_return.type = 1;
+                    return verdict_return;
                 } else {
                     add_lexem(current_lexem, 3, lexems);
                     state = States::H;

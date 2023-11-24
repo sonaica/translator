@@ -1,4 +1,10 @@
 fun main(){
     int a, b;
-    input .a, b;
+    input a, b;
+    bool f;
+    output f;
+    if (a == 5) {
+        int b = 7abc;
+    }
+    return;
 }
