@@ -74,6 +74,18 @@
 
 <Unary> ::= + | - | ++ | -- | ~ | new | delete | & | * | ~
 
+<Mul> ::= *
+
+<Sum> ::= +
+
+<Power> ::= **
+
+<And> ::= & | and
+
+<Xor> ::= ^
+
+<Or> ::= '|' | or
+
 <Mul term> ::= <Sum term><Mul><Mul term> | <Sum term>
 
 <Sum term> ::= <Power term><Sum><Sum term> | <Power term>
