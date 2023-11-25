@@ -125,7 +125,7 @@ Verdict FSM(std::vector<char> &text, std::vector<Lexem> &lexems) {
                 } else if (is_operation(cur)) {
                     current_lexem += cur;
                     ++i;
-                    state == States::Operation;
+                    state = States::Operation;
                 } else if (cur == ',') {
                     current_lexem += cur;
                     ++i;
