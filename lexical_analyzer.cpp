@@ -27,13 +27,7 @@ void CreateBor(std::string file_keywords) {
     }
 }
 
-enum class States {
-    H,
-    Id,
-    Operation,
-    Literal_Int,
-    Literal_Double,
-};
+enum class States { H, Id, Operation, Literal_Int, Literal_Double, Comment };
 
 struct Lexem {
     int type;
@@ -116,6 +110,10 @@ Verdict FSM(std::vector<char> &text, std::vector<Lexem> &lexems) {
                     else
                         add_lexem(current_lexem, 1, lexems);
                     continue;
+                } else if (cur == '/' && i + 1 < text.size() &&
+                           text[i + 1] == '/') {
+                    i += 2;
+                    state = States::Comment;
                 } else if (is_letter(cur)) {
                     current_lexem += cur;
                     ++i;
@@ -202,6 +200,11 @@ Verdict FSM(std::vector<char> &text, std::vector<Lexem> &lexems) {
                     state = States::H;
                 }
                 break;
+            case States::Comment:
+                if (cur != '\n')
+                    ++i;
+                else
+                    state = States::H;
         }
     }
     return verdict_return;

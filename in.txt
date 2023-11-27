@@ -1,21 +1,4 @@
-import catalog\name
-
-define int long
-
-fun f(int a, int b) int {
-    return a + b;
-}
-
-struct my_struct{
-    int x, y;
-    fun struct_fun(){
-        return x * y;
-    }
-}
-
 fun main(){
-    int a, b;
-    input a, b;
-    output f(a, b);
+    int a, b; // some text
     return;
 }
