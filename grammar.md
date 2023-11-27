@@ -8,9 +8,7 @@
 
 <Directive> ::= import <Library>; | define <Definition>;
 
-<Library> ::= <Catalog>
-
-<Catalog> ::= <String>\<Catalog>|<String>
+<Library> ::= <String>
 
 <Definition> ::= <String> <String>
 
@@ -44,7 +42,7 @@
 
 <Letter> ::= [a-z] | [A-Z] | <Special symbol>
 
-<Special symbol> ::= @ | # | £ | $ | _
+<Special symbol> ::=  _ | /
 
 <Type> ::= void | int | double | bool
 
