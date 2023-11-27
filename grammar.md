@@ -6,7 +6,7 @@
 
 <Preprocessing> ::= <Directive> 
 
-<Directive> ::= import <Library>; | define <Definition>;
+<Directive> ::= import "<Library>"; | define <Definition>;
 
 <Library> ::= <String>
 
