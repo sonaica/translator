@@ -18,7 +18,7 @@
 ```
 ### Functions
 ```
-<Function definition> ::= fun <Name> “(“ <Function parameters> “)” -> <Type>  ‘{‘ <Operator> return <Expression>‘}’
+<Function definition> ::= fun <Name> “(“ <Function parameters> “)” <Type>  ‘{‘ <Operator> return <Expression>‘}’
 
 <Function parameters> ::= <Type> <Name> | <Type> <Name>, <Function parameters>
 

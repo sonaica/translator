@@ -1,3 +1,52 @@
+1 - keyword
+2 - identifier
+3 - literal
+4 - operation
+5 - ; and {}
+6 - ,
+7 - ()
+
+import 1
+catalog\name 2
+define 1
+int 1
+long 2
+fun 1
+f 2
+( 7
+int 1
+a 2
+, 6
+int 1
+b 2
+) 7
+int 1
+{ 5
+return 1
+a 2
+b 2
+; 5
+} 5
+struct 1
+my_struct 2
+{ 5
+int 1
+x 2
+, 6
+y 2
+; 5
+fun 1
+struct 1
+_fun 2
+( 7
+) 7
+{ 5
+return 1
+x 2
+y 2
+; 5
+} 5
+} 5
 fun 1
 main 1
 ( 7
@@ -13,24 +62,14 @@ a 2
 , 6
 b 2
 ; 5
-bool 1
-f 2
-; 5
 output 1
 f 2
-; 5
-if 1
 ( 7
 a 2
-5 3
-) 7
-{ 5
-int 1
+, 6
 b 2
-7 3
-abc 2
+) 7
 ; 5
-} 5
 return 1
 ; 5
 } 5

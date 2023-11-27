@@ -48,13 +48,15 @@ struct Verdict {
 
 bool is_operation(char c) {
     if (c == '=' || c == '+' || c == '-' || c == '~' || c == '&' || c == '|' ||
-        c == '*' || c == '>' || c == '<' || c == '/' || c == '^' || c == '%')
+        c == '*' || c == '>' || c == '<' || c == '/' || c == '^' || c == '%' ||
+        c == '.')
         return true;
     return false;
 }
 
 bool is_letter(char c) {
-    if (c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c == '_') return true;
+    if (c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c == '_' || c == '\\')
+        return true;
     return false;
 }
 
@@ -125,7 +127,7 @@ Verdict FSM(std::vector<char> &text, std::vector<Lexem> &lexems) {
                 } else if (is_operation(cur)) {
                     current_lexem += cur;
                     ++i;
-                    state = States::Operation;
+                    state == States::Operation;
                 } else if (cur == ',') {
                     current_lexem += cur;
                     ++i;
@@ -225,6 +227,13 @@ void ReadFile(std::string file, std::vector<char> &text) {
 
 void OutputLexems(std::string file, std::vector<Lexem> &vec) {
     std::ofstream out(file);
+    out << "1 - keyword\n";
+    out << "2 - identifier\n";
+    out << "3 - literal\n";
+    out << "4 - operation\n";
+    out << "5 - ; and {}\n";
+    out << "6 - ,\n";
+    out << "7 - ()\n\n";
     if (out.is_open()) {
         for (int i = 0; i < vec.size(); ++i) {
             out << vec[i].content << " " << vec[i].type << '\n';

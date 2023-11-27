@@ -1,10 +1,21 @@
+import catalog\name
+
+define int long
+
+fun f(int a, int b) int {
+    return a + b;
+}
+
+struct my_struct{
+    int x, y;
+    fun struct_fun(){
+        return x * y;
+    }
+}
+
 fun main(){
     int a, b;
     input a, b;
-    bool f;
-    output f;
-    if (a == 5) {
-        int b = 7abc;
-    }
+    output f(a, b);
     return;
 }
