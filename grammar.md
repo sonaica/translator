@@ -18,11 +18,11 @@
 ```
 ### Functions
 ```
-<Function definition> ::= fun <Name> “(“ <Function parameters> “)” -> <Type>  ‘{‘ <Operator> ‘}’
+<Function definition> ::= fun <Name> “(“ <Function parameters> “)” -> <Type>  ‘{‘ <Operator> return <Expression>‘}’
 
 <Function parameters> ::= <Type> <Name> | <Type> <Name>, <Function parameters>
 
-<Function call> ::= <Name>(<Argument list>);
+<Function call> ::= <Name>(<Argument list>)
 
 <Argument list> ::= <Name> {, <Name> }
 ```
@@ -62,9 +62,9 @@
 ```
 ### Expression
 ```
-<Expression> ::= <Arithmetic expression> | <Comparison> | <Function call> | <Assignment> | <Expression>, <Expression> | <Variable>
+<Expression> ::= <Arithmetic expression> | <Comparison> | <Function call> | <Assignment> | <Expression>, <Expression> | <Variable> | <Struct member>
 
-<Expression operator> ::= <Expression> ;
+<Expression operator> ::= <Expression>;
 ```
 ### Arithmetic and logic
 ```
@@ -164,6 +164,6 @@
 ```
 ### Match
 ```
-<Match> ::= match <Name> ‘{‘ {<Expression> => <Operator>;} ‘}’
+<Match> ::= match <Name> ‘{‘ {<Expression> => <Operator>} ‘}’
 ```
 
