@@ -134,9 +134,11 @@
 ```
 ### Input and Output
 ```
-<Input>::= input { <Variable>, } <Variable>; 
+//<Input>::= input { <Variable>, } <Variable>;
+<Input> ::= input <Variable> {, <Variable>}; 
 
-<Output>::= output {<Expression>,} <Expression>;
+//<Output>::= output {<Expression>,} <Expression>;
+<Output> ::= output <Expression> {, <Expression>};
 ```
 ### Arrays
 ```
