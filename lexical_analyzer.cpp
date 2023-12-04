@@ -27,7 +27,15 @@ void CreateBor(std::string file_keywords) {
     }
 }
 
-enum class States { H, Id, Operation, Literal_Int, Literal_Double, Comment };
+enum class States {
+    H,
+    Id,
+    Operation,
+    Literal_Int,
+    Literal_Double,
+    Comment,
+    Literal_String
+};
 
 struct Lexem {
     int type;
@@ -125,7 +133,7 @@ Verdict FSM(std::vector<char> &text, std::vector<Lexem> &lexems) {
                 } else if (is_operation(cur)) {
                     current_lexem += cur;
                     ++i;
-                    state == States::Operation;
+                    state = States::Operation;
                 } else if (cur == ',') {
                     current_lexem += cur;
                     ++i;
@@ -143,7 +151,11 @@ Verdict FSM(std::vector<char> &text, std::vector<Lexem> &lexems) {
                     ++i;
                 } else if (cur == ' ')
                     ++i;
-                else if (is_alphabet(cur)) {
+                else if (cur == '\"') {
+                    current_lexem += cur;
+                    ++i;
+                    state = States::Literal_String;
+                } else if (is_alphabet(cur)) {
                     verdict_return.is_error = true;
                     verdict_return.line_number = lines;
                     verdict_return.type = 1;
@@ -205,6 +217,18 @@ Verdict FSM(std::vector<char> &text, std::vector<Lexem> &lexems) {
                     ++i;
                 else
                     state = States::H;
+                break;
+            case States::Literal_String:
+                if (cur != '\"') {
+                    current_lexem += cur;
+                    ++i;
+                } else {
+                    current_lexem += cur;
+                    ++i;
+                    add_lexem(current_lexem, 3, lexems);
+                    state = States::H;
+                }
+                break;
         }
     }
     return verdict_return;
@@ -262,9 +286,10 @@ int main() {
         } else if (verdict.type == 2) {
             std::cout << "Invalid character";
         }
+        return 1;
     } else {
         OutputLexems(file_out, lexems);
         std::cout << "OK";
+        return 0;
     }
-    return 0;
 }
