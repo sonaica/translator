@@ -84,21 +84,21 @@
 
 <Shift> ::= << | >>
 
-<Unary term> ::= <Power term> | <Unary><Unary term>
+<Unary term> ::= <Unary><Unary term> | <Power term>
 
-<Power term> ::= <Mul term><Power><Power term> | <Mul term>
+<Power term> ::= <Mul term>{<Power><Mul term>}
 
-<Mul term> ::= <Sum term><Mul><Mul term> | <Sum term>
+<Mul term> ::= <Sum term>{<Mul><Sum term>}
 
-<Sum term> ::= <Shift term><Sum><Sum term> | <Shift term>
+<Sum term> ::= <Shift term>{<Sum><Shift term>}
 
-<Shift term> ::= <And term><Shift><Shift term> | <And term>
+<Shift term> ::= <And term>{<Shift><And term>}
 
-<And term> ::= <Xor term><And><And term> | <Xor term>
+<And term> ::= <Xor term>{<And><Xor term>}
 
-<Xor term> ::= <Or term><Xor><Xor term> | <Or term>
+<Xor term> ::= <Or term>{<Xor><Or term>}
 
-<Or term> ::= <Arithmetic term><Or><Or term> | <Arithmetic term>
+<Or term> ::= <Arithmetic term>{<Or><Arithmetic term>}
 
 <Arithmetic term> ::= <Arithmetic literal> | <Variable> | <Boolean literal>
 
