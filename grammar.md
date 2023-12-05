@@ -2,9 +2,7 @@
 
 ### Program structure
 ```
-<Program> ::= {<Preprocessing>} { <Global statement> } fun main() ‘{‘ <Operator> ‘}’
-
-<Preprocessing> ::= <Directive> 
+<Program> ::= {<Directive>} { <Global statement> } fun main() ‘{‘ <Operator> ‘}’
 
 <Directive> ::= import "<Library>"; | define <Definition>;
 
