@@ -2,7 +2,7 @@
 
 ### Program structure
 ```
-<Program> ::= {<Directive>} { <Global statement> } fun main() ‘{‘ <Operator> ‘}’
+<Program> ::= {<Directive>} { <Global statement> } main() ‘{‘ <Operator> ‘}’
 
 <Directive> ::= import "<String>"; | define <String> <String>;
 
