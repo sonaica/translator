@@ -1,0 +1,7 @@
+1 - keyword
+2 - identifier
+3 - literal
+4 - operation
+5 - ; and {}
+6 - ,
+7 - ()

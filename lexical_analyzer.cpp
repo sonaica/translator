@@ -1,17 +1,15 @@
+#include "lexical_analyzer.h"
+
 #include <fstream>
-#include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
 
-const int bor_size = 256;
-
-struct Vertex {
-    Vertex *to[bor_size] = {0};
-    bool terminal = false;
-};
-
 Vertex *root = new Vertex();
+
+extern std::vector<char>text;
+extern int pos;
+extern int lines;
 
 void CreateBor(std::string file_keywords) {
     std::string str;
@@ -26,27 +24,6 @@ void CreateBor(std::string file_keywords) {
         v->terminal = true;
     }
 }
-
-enum class States {
-    H,
-    Id,
-    Operation,
-    Literal_Int,
-    Literal_Double,
-    Comment,
-    Literal_String
-};
-
-struct Lexem {
-    int type;
-    std::string content;
-};
-
-struct Verdict {
-    bool is_error = false;
-    int type = -1;
-    int line_number = -1;
-};
 
 bool is_operation(char c) {
     if (c == '=' || c == '+' || c == '-' || c == '~' || c == '&' || c == '|' ||
@@ -67,9 +44,9 @@ bool is_digit(char c) {
     return false;
 }
 
-bool is_keyword(std::vector<char> &text, int &i, std::string &keyword) {
+bool is_keyword(std::string &keyword) {
     auto v = root;
-    int ind = i;
+    int ind = pos;
     std::string str;
     while (v != nullptr) {
         if (v->terminal) {
@@ -83,7 +60,7 @@ bool is_keyword(std::vector<char> &text, int &i, std::string &keyword) {
         keyword.clear();
         return false;
     }
-    i = ind - 1;
+    pos = ind - 1;
     return true;
 }
 
@@ -94,66 +71,71 @@ bool is_alphabet(char c) {
     return false;
 }
 
-void add_lexem(std::string &str, int type, std::vector<Lexem> &lexems) {
+Lexem create_lexem(std::string str, int type) {
     Lexem lex;
     lex.content = str;
     lex.type = type;
-    lexems.push_back(lex);
-    str.clear();
+    return lex;
 }
 
-Verdict FSM(std::vector<char> &text, std::vector<Lexem> &lexems) {
+Verdict FSM() {
+    Lexem lex;
     States state = States::H;
     char cur;
     std::string current_lexem;
     Verdict verdict_return;
-    int lines = 1;
-    for (int i = 0; i < text.size();) {
-        cur = text[i];
+    while (pos < text.size()) {
+        cur = text[pos];
         switch (state) {
             case States::H:
-                if (is_keyword(text, i, current_lexem)) {
-                    if (current_lexem == "true" || current_lexem == "false")
-                        add_lexem(current_lexem, 3, lexems);
-                    else
-                        add_lexem(current_lexem, 1, lexems);
+                if (is_keyword(text, pos, current_lexem)) {
+                    if (current_lexem == "true" || current_lexem == "false") {
+                        verdict_return.lexem = create_lexem(current_lexem, 3);
+                        return verdict_return;
+                    } else {
+                        verdict_return.lexem = create_lexem(current_lexem, 1);
+                        return verdict_return;
+                    }
                     continue;
-                } else if (cur == '/' && i + 1 < text.size() &&
-                           text[i + 1] == '/') {
-                    i += 2;
+                } else if (cur == '/' && pos + 1 < text.size() &&
+                           text[pos + 1] == '/') {
+                    pos += 2;
                     state = States::Comment;
                 } else if (is_letter(cur)) {
                     current_lexem += cur;
-                    ++i;
+                    ++pos;
                     state = States::Id;
                 } else if (is_digit(cur)) {
                     current_lexem += cur;
-                    ++i;
+                    ++pos;
                     state = States::Literal_Int;
                 } else if (is_operation(cur)) {
                     current_lexem += cur;
-                    ++i;
+                    ++pos;
                     state = States::Operation;
                 } else if (cur == ',') {
                     current_lexem += cur;
-                    ++i;
-                    add_lexem(current_lexem, 6, lexems);
+                    ++pos;
+                    verdict_return.lexem = create_lexem(current_lexem, 6);
+                    return verdict_return;
                 } else if (cur == '(' || cur == ')') {
                     current_lexem += cur;
-                    ++i;
-                    add_lexem(current_lexem, 7, lexems);
+                    ++pos;
+                    verdict_return.lexem = create_lexem(current_lexem, 7);
+                    return verdict_return;
                 } else if (cur == '{' || cur == '}' || cur == ';') {
                     current_lexem += cur;
-                    ++i;
-                    add_lexem(current_lexem, 5, lexems);
+                    ++pos;
+                    verdict_return.lexem = create_lexem(current_lexem, 5);
+                    return verdict_return;
                 } else if (cur == '\n') {
                     ++lines;
-                    ++i;
+                    ++pos;
                 } else if (cur == ' ')
-                    ++i;
+                    ++pos;
                 else if (cur == '\"') {
                     current_lexem += cur;
-                    ++i;
+                    ++pos;
                     state = States::Literal_String;
                 } else if (is_alphabet(cur)) {
                     verdict_return.is_error = true;
@@ -170,28 +152,28 @@ Verdict FSM(std::vector<char> &text, std::vector<Lexem> &lexems) {
             case States::Id:
                 if (is_letter(cur) || is_digit(cur)) {
                     current_lexem += cur;
-                    ++i;
+                    ++pos;
                 } else {
-                    add_lexem(current_lexem, 2, lexems);
-                    state = States::H;
+                    verdict_return.lexem = create_lexem(current_lexem, 2);
+                    return verdict_return;
                 }
                 break;
             case States::Operation:
                 if (is_operation(cur)) {
                     current_lexem += cur;
-                    ++i;
+                    ++pos;
                 } else {
-                    add_lexem(current_lexem, 4, lexems);
-                    state = States::H;
+                    verdict_return.lexem = create_lexem(current_lexem, 4);
+                    return verdict_return;
                 }
                 break;
             case States::Literal_Int:
                 if (is_digit(cur)) {
                     current_lexem += cur;
-                    ++i;
+                    ++pos;
                 } else if (cur == '.') {
                     current_lexem += cur;
-                    ++i;
+                    ++pos;
                     state = States::Literal_Double;
                 } else if (is_letter(cur)) {
                     verdict_return.is_error = true;
@@ -199,34 +181,34 @@ Verdict FSM(std::vector<char> &text, std::vector<Lexem> &lexems) {
                     verdict_return.type = 1;
                     return verdict_return;
                 } else {
-                    add_lexem(current_lexem, 3, lexems);
-                    state = States::H;
+                    verdict_return.lexem = create_lexem(current_lexem, 3);
+                    return verdict_return;
                 }
                 break;
             case States::Literal_Double:
                 if (is_digit(cur)) {
                     current_lexem += cur;
-                    ++i;
+                    ++pos;
                 } else {
-                    add_lexem(current_lexem, 3, lexems);
-                    state = States::H;
+                    verdict_return.lexem = create_lexem(current_lexem, 3);
+                    return verdict_return;
                 }
                 break;
             case States::Comment:
                 if (cur != '\n')
-                    ++i;
+                    ++pos;
                 else
                     state = States::H;
                 break;
             case States::Literal_String:
                 if (cur != '\"') {
                     current_lexem += cur;
-                    ++i;
+                    ++pos;
                 } else {
                     current_lexem += cur;
-                    ++i;
-                    add_lexem(current_lexem, 3, lexems);
-                    state = States::H;
+                    ++pos;
+                    verdict_return.lexem = create_lexem(current_lexem, 3);
+                    return verdict_return;
                 }
                 break;
         }
@@ -234,62 +216,10 @@ Verdict FSM(std::vector<char> &text, std::vector<Lexem> &lexems) {
     return verdict_return;
 }
 
-void ReadFile(std::string file, std::vector<char> &text) {
-    std::ifstream in(file);
-    if (in.is_open()) {
-        in.seekg(0, in.end);
-        int size = in.tellg();
-        in.seekg(0, in.beg);
-
-        char *buffer = new char[size];
-        in.read(buffer, size);
-
-        for (int i{}; i < size; ++i) {
-            text.push_back(buffer[i]);
-        }
-        in.close();
-        delete[] buffer;
-    }
-}
-
-void OutputLexems(std::string file, std::vector<Lexem> &vec) {
-    std::ofstream out(file);
-    out << "1 - keyword\n";
-    out << "2 - identifier\n";
-    out << "3 - literal\n";
-    out << "4 - operation\n";
-    out << "5 - ; and {}\n";
-    out << "6 - ,\n";
-    out << "7 - ()\n\n";
-    if (out.is_open()) {
-        for (int i = 0; i < vec.size(); ++i) {
-            out << vec[i].content << " " << vec[i].type << '\n';
-        }
-    }
-    out.close();
-}
-
-int main() {
-    // std::cout << "Enter the name of file: ";
-    std::string file_in = "in.txt", file_out = "out.txt";
-    std::string file_keywords = "keywords.txt";
-    std::vector<char> text;
-    std::vector<Lexem> lexems;
-    CreateBor(file_keywords);
-    ReadFile(file_in, text);
-
-    auto verdict = FSM(text, lexems);
-    if (verdict.is_error) {
-        std::cout << "line " << verdict.line_number << ": ";
-        if (verdict.type == 1) {
-            std::cout << "Impossible to allocate a lexem";
-        } else if (verdict.type == 2) {
-            std::cout << "Invalid character";
-        }
-        return 1;
-    } else {
-        OutputLexems(file_out, lexems);
-        std::cout << "OK";
-        return 0;
-    }
-}
+// void add_lexem(std::string &str, int type, std::vector<Lexem> &lexems) {
+//     Lexem lex;
+//     lex.content = str;
+//     lex.type = type;
+//     lexems.push_back(lex);
+//     str.clear();
+// }
