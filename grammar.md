@@ -2,11 +2,10 @@
 
 ### Program structure
 ```
-<Program> ::= {<Directive>} { <Global statement> } main() ‘{‘ <Operator> ‘}’
+<Program> ::= {<Directive>} { <Function definition> | <Struct definition> | <Variable creation> } main() ‘{‘ <Operator> ‘}’
 
 <Directive> ::= import "<String>"; | define <String> <String>;
 
-<Global statement> ::= <Function definition> | <Struct definition> | <Variable creation>
 ```
 ### Functions
 ```
