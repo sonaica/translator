@@ -52,7 +52,9 @@
 ```
 ### Expression
 ```
-<Expression> ::= <Arithmetic expression> | <Comparison> | <Function call> | <Assignment> | <Expression>, <Expression> | <Variable> | <Struct member>
+<Expression>::= <Expression enum>
+<Expressin enum>::= <Expression term> [, <Expression term> ]
+<Expression terms>::= <Arithmetic expression> | <Comparison> | <Function call> | <Assignment> | <Variable> | <Struct member>
 
 <Expression operator> ::= <Expression>;
 ```
@@ -112,7 +114,7 @@
 ```
 ### Operator
 ```
-<Operator>::= ‘{‘ { <Operator> } ‘}’ | <Operator>; <Operator> | <If> | <For> | <While> | <Input> | <Output> | <Expression operator> | <Variable creation> | <Match>
+<Operator>::= ‘{‘ { <Operator> } ‘}’ | <If> | <For> | <While> | <Input> | <Output> | <Expression operator> | <Variable creation> | <Match>
 ```
 ### Conditional operator
 ```
