@@ -6,7 +6,7 @@
 
 <Directive> ::= import "<String>"; | define <String> <String>;
 
-<Global statement> ::= <Function definition> | <Struct definition> | <Variable Creation>
+<Global statement> ::= <Function definition> | <Struct definition> | <Variable creation>
 ```
 ### Functions
 ```
@@ -20,7 +20,7 @@
 ```
 ### Structures
 ```
-<Struct definition> ::= struct <Name>  ‘{‘ <Function definition> | <Variable Creation> ‘}’ { <Name>, } <Name>;
+<Struct definition> ::= struct <Name>  ‘{‘ <Function definition> | <Variable creation> ‘}’ { <Name>, } <Name>;
 
 <Struct member> ::= <Name>.(<Name>|<Function call>)
 ```
@@ -40,7 +40,7 @@
 
 <Type> ::= void | int | double | bool
 
-<Variable Creation> ::= <Variable Definition> | <Variable Initialization>
+<Variable creation> ::= <Variable Definition> | <Variable Initialization>
 
 <Variable Definition> ::= <Type> {<Name>, } <Name>;
 
@@ -114,7 +114,7 @@
 ```
 ### Operator
 ```
-<Operator>::= ‘{‘ { <Operator> } ‘}’ | <Operator>; <Operator> | <If> | <For> | <While> | <Input> | <Output> | <Expression operator> | <Variable Creation> | <Match>
+<Operator>::= ‘{‘ { <Operator> } ‘}’ | <Operator>; <Operator> | <If> | <For> | <While> | <Input> | <Output> | <Expression operator> | <Variable creation> | <Match>
 ```
 ### Conditional operator
 ```
