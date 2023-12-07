@@ -5,7 +5,6 @@
 <Program> ::= {<Directive>} { <Function definition> | <Struct definition> | <Variable creation> } main() ‘{‘ <Operator> ‘}’
 
 <Directive> ::= import "<String>"; | define <String> <String>;
-
 ```
 ### Functions
 ```
