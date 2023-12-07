@@ -4,11 +4,7 @@
 ```
 <Program> ::= {<Directive>} { <Global statement> } fun main() ‘{‘ <Operator> ‘}’
 
-<Directive> ::= import "<Library>"; | define <Definition>;
-
-<Library> ::= <String>
-
-<Definition> ::= <String> <String>
+<Directive> ::= import "<String>"; | define <String> <String>;
 
 <Global statement> ::= <Function definition> | <Struct definition> | <Variable Creation>
 ```
