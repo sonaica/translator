@@ -18,7 +18,7 @@
 ```
 ### Structures
 ```
-<Struct definition> ::= struct <Name>  ‘{‘ <Function definition> | <Variable creation> ‘}’ { <Name>, } <Name>;
+<Struct definition> ::= struct <Name>  ‘{‘ <Function definition> | <Variable creation> ‘}’ <Name> {, <Name>};
 
 <Struct member> ::= <Name>.(<Name>|<Function call>)
 ```
@@ -40,7 +40,7 @@
 
 <Variable creation> ::= <Variable Definition> | <Variable Initialization>
 
-<Variable Definition> ::= <Type> {<Name>, } <Name>;
+<Variable Definition> ::= <Type> <Name> {, <Name>};
 
 <Variable Initialization> ::= <Type> {<Name> ::= <Expression>, } <Name> ::= <Expression>;
 
