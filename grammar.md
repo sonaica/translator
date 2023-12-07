@@ -10,7 +10,7 @@
 ```
 <Function definition> ::= fun <Name> “(“ <Function parameters> “)” <Type>  ‘{‘ <Operator> return <Expression>‘}’
 
-<Function parameters> ::= <Type> <Name> | <Type> <Name>, <Function parameters>
+<Function parameters> ::= <Type> <Name> {, <Type> <Name> }
 
 <Function call> ::= <Name>(<Argument list>)
 
