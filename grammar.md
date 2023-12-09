@@ -40,7 +40,7 @@
 
 <Type> ::= void | int | double | bool
 
-<Variable creation> ::= <Variable Definition> | <Variable Initialization>
+<Variable Creation> ::= <Variable Definition> | <Variable Initialization>
 
 <Variable Definition> ::= <Type> <Name> {, <Name>};
 
