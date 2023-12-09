@@ -12,9 +12,9 @@
 
 <Function parameters> ::= "(" <Type> <Name> {, <Type> <Name> } ")"
 
-<Function call> ::= <Name>(<Argument list>)
+<Function call> ::= <Name><Argument list>
 
-<Argument list> ::= <Name> {, <Name> }
+<Argument list> ::= (<Name> {, <Name> })
 ```
 ### Structures
 ```
