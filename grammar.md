@@ -40,7 +40,7 @@
 
 <Type> ::= void | int | double | bool
 
-<Variable Creation> ::= <Type> <Name> (= <Expression>) {, <Name> (= <Expression>)};
+<Variable Creation> ::= <Type> <Name> (= <Expression>) {, <Name> (= <Expression>)}
 
 <Variable Definition> ::= <Type> <Name> {, <Name>};
 
@@ -59,8 +59,6 @@
 <Expressin enum>::= <Expression term> {, <Expression term> }
 
 <Expression terms>::= <Arithmetic expression> | <Comparison> | <Function call> | <Assignment> | <Variable> | <Struct member>
-
-<Expression operator> ::= <Expression>;
 ```
 ### Arithmetic and logic
 ```
@@ -118,7 +116,7 @@
 ```
 ### Operator
 ```
-<Operator>::= ‘{‘ { <Operator> } ‘}’ | <If> | <For> | <While> | <Input> | <Output> | <Expression operator> | <Variable creation> | <Match>
+<Operator>::= ‘{‘ { <Operator> } ‘}’ | <If> | <For> | <While> | <Input>; | <Output>; | <Expression>; | <Variable creation>; | <Match>
 ```
 ### Conditional operator
 ```
@@ -132,11 +130,9 @@
 ```
 ### Input and Output
 ```
-//<Input>::= input { <Variable>, } <Variable>;
-<Input> ::= input <Variable> {, <Variable>}; 
+<Input> ::= input <Variable> {, <Variable>}
 
-//<Output>::= output {<Expression>,} <Expression>;
-<Output> ::= output <Expression> {, <Expression>};
+<Output> ::= output <Expression> {, <Expression>}
 ```
 ### Arrays
 ```
