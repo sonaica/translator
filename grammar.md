@@ -138,25 +138,15 @@
 ```
 ### Arrays
 ```
-<Array<Type> declaration> ::= <Type> <Name>”[“<Expression>”]” [ = “{“
-<Literal<Type>>,
-<Literal<Type>>,
-<Literal<Type>>,
-…
-<Literal<Type>>”}”];
+<Array declaration>::= <Array declaration exact> | <Array declaration auto>
 
-// <Literal<Type>> - repeated <Expression> times
+<Array declaration exact> ::= <Type> <Name>”[“<Expression>”]” [ = “{“ <Literal> {, <Literal>} "}"];
 
-<Array<Type> declaration> ::= <Type> <Name> “[]” = “{“
-<Literal<Type>>,
-<Literal<Type>>,
-<Literal<Type>>,
-…
-<Literal<Type>>”}”;
-
-// <Literal<Type>> - repeated any number of times
+<Array declaration auto> ::= <Type> <Name> “[]” = “{“ <Literal> {, <Literal> } "}";
 
 <Array indexation> ::= <Name>[<Expression>]
+
+<Literal>::= <Arithmetic literal> | <boolean literal>
 ```
 ### Match
 ```
