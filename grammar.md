@@ -44,7 +44,7 @@
 
 <Variable Definition> ::= <Type> <Name> {, <Name>};
 
-<Variable Initialization> ::= <Type> {<Name> ::= <Expression>, } <Name> ::= <Expression>;
+<Variable Initialization> ::= <Type> {<Name> = <Expression>, } <Name> = <Expression>;
 
 <Sign> ::= + | -
 
