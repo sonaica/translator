@@ -34,6 +34,8 @@
 
 <Letter> ::= [a-z] | [A-Z] | <Special symbol>
 
+<Digit> ::= [0-9]
+
 <Special symbol> ::=  _ | /
 
 <Type> ::= void | int | double | bool
