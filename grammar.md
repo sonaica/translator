@@ -24,7 +24,7 @@
 ```
 ### Types and variables
 ```
-<String> ::= <Symbol> | <Symbol><String>
+<String> ::= <Symbol>{<Symbol>}
 
 <Symbol> ::= <Letter> | <Digit>
 
