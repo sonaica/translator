@@ -2,13 +2,13 @@
 
 ### Program structure
 ```
-<Program> ::= {<Directive>} { <Function definition> | <Struct definition> | <Variable creation> } main() ‘{‘ <Operator> ‘}’
+<Program> ::= {<Directive>} { fun <Function definition> | struct <Struct definition> | <Type><Variable creation> } main() ‘{‘ <Operator> ‘}’
 
 <Directive> ::= import "<String>"; | define <String> <String>;
 ```
 ### Functions
 ```
-<Function definition> ::= fun <Name> <Function parameters> <Type>  ‘{‘ <Operator> return <Expression>‘}’
+<Function definition> ::=  <Name> <Function parameters> <Type>  ‘{‘ <Operator> return <Expression>‘}’
 
 <Function parameters> ::= "(" <Type> <Name> {, <Type> <Name> } ")"
 
@@ -18,7 +18,7 @@
 ```
 ### Structures
 ```
-<Struct definition> ::= struct <Name>  ‘{‘ { <Function definition> | <Variable creation> } ‘}’ <Name> {, <Name>};
+<Struct definition> ::= <Name>  ‘{‘ { <Function definition> | <Variable creation> } ‘}’ <Name> {, <Name>};
 
 <Struct member> ::= <Name>.(<Name>|<Function call>)
 ```
@@ -40,9 +40,9 @@
 
 <Variable creation> ::= <Variable Definition> | <Variable Initialization>
 
-<Variable Definition> ::= <Type> <Name> {, <Name>};
+<Variable Definition> ::= <Name> {, <Name>};
 
-<Variable Initialization> ::= <Type> {<Name> ::= <Expression>, } <Name> ::= <Expression>;
+<Variable Initialization> ::= {<Name> ::= <Expression>, } <Name> ::= <Expression>;
 
 <Sign> ::= + | -
 
