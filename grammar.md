@@ -142,7 +142,7 @@
 
 <Array declaration auto> ::= <Type> <Name> “[]” = “{“ <Literal> {, <Literal> } "}";
 
-<Array indexation> ::= <Name>[<Expression>]
+<Array indexation> ::= <Name>"["<Expression>"]"
 
 <Literal>::= <Arithmetic literal> | <boolean literal>
 ```
