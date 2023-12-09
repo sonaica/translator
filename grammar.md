@@ -18,7 +18,7 @@
 ```
 ### Structures
 ```
-<Struct definition> ::= struct <Name>  ‘{‘ <Function definition> | <Variable creation> ‘}’ <Name> {, <Name>};
+<Struct definition> ::= struct <Name>  ‘{‘ { <Function definition> | <Variable creation> } ‘}’ <Name> {, <Name>};
 
 <Struct member> ::= <Name>.(<Name>|<Function call>)
 ```
