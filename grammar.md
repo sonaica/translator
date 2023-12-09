@@ -28,7 +28,7 @@
 
 <Symbol> ::= <Letter> | <Digit>
 
-<Name> ::= <Letter> | <Name><Letter> | <Name><Digit>
+<Name> ::= <Letter>{<Letter>|<Digit>}
 
 <Variable>::= <Name> | <Array Indexation>
 
