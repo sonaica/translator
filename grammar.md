@@ -116,7 +116,7 @@
 ```
 ### Operator
 ```
-<Operator>::= ‘{‘ { <Operator> } ‘}’ | <If> | <For> | <While> | <Input>; | <Output>; | <Expression>; | <Variable creation>; | <Match>
+<Operator>::= "{" { <Operator> } "}" | <If> | <For> | <While> | <Input>; | <Output>; | <Expression>; | <Variable creation>; | <Match>
 ```
 ### Conditional operator
 ```
