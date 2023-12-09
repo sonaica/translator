@@ -54,7 +54,7 @@
 ```
 <Expression>::= <Expression enum>
 
-<Expressin enum>::= <Expression term> [, <Expression term> ]
+<Expressin enum>::= <Expression term> {, <Expression term> }
 
 <Expression terms>::= <Arithmetic expression> | <Comparison> | <Function call> | <Assignment> | <Variable> | <Struct member>
 
