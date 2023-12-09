@@ -120,13 +120,13 @@
 ```
 ### Conditional operator
 ```
-<If> :: if (<Expression>) <Operator> [ else <Operator> ]
+<If> :: if "("<Expression>")" <Operator> [ else <Operator> ]
 ```
 ### Cycles
 ```
-<For>::= for (<Variable Initialization>; <Expression>; <Expression>) <Operator>
+<For>::= for "("<Variable Initialization>; <Expression>; <Expression>")" <Operator>
 
-<While>::= while ‘(‘ <Expression> ‘)’ do <Operator>
+<While>::= while "(" <Expression> ")" do <Operator>
 ```
 ### Input and Output
 ```
