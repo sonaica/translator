@@ -12,6 +12,8 @@ extern int pos;
 extern int lines;
 extern Lexem lexem;
 
+Verdict verdict;
+
 void ReadFile(std::string file, std::vector<char> &text) {
     std::ifstream in(file);
     if (in.is_open()) {
@@ -81,7 +83,7 @@ void Comparison() {
 }
 
 void Comparisons_Operators() {
-    if (lexem.content != ">" && lexem.content != "<" && lexem.content != ">=" &&
+    if (lexem.content != ">" && lexem.content != ">" && lexem.content != ">=" &&
         lexem.content != "<=" && lexem.content != "==" &&
         lexem.content != "!=") {
         // throw
@@ -91,49 +93,47 @@ void Comparisons_Operators() {
 
 void Operator() {
     if (lexem.content == "{") {
-        while (lexem.content == "{") {
-            lexem = request_lexem();
+        lexem = request_lexem();
+        while (lexem.content != "}") {
             Operator();
-            if (lexem.content != "}") {
-            }  // throw
-            lexem = request_lexem();
         }
     } else {
-        // CHEAT
-        Lexem next = request_lexem();
-        if (next.content == "if") {
-            lexem = request_lexem();
+        lexem = request_lexem();
+        if (lexem.content == "if") {
             If();
         }
-        if (next.content == "while") {
-            lexem = request_lexem();
+        if (lexem.content == "while") {
             While();
         }
-        if (next.content == "for") {
-            lexem = request_lexem();
+        if (lexem.content == "for") {
             For();
         }
-        if (next.content == "input") {
-            lexem = request_lexem();
+        if (lexem.content == "input") {
             Input();
         }
-        if (next.content == "output") {
-            lexem = request_lexem();
+        if (lexem.content == "output") {
             Output();
         }
-        if (next.content == "match") {
-            lexem = request_lexem();
+        if (lexem.content == "match") {
             Match();
         }
-        // Expression operator
-        // Variable creation
+        if (lexem.content == "int" || lexem.content == "void" ||
+            lexem.content == "bool") {
+            Variable_Creation();
+            if (lexem.content != ";") {
+                // throw
+            }
+        } else {
+            Expression();
+            if (lexem.content != ";") {
+                // throw
+            }
+        }
     }
     lexem = request_lexem();
 }
 
 void If() {
-    if (lexem.content != "if") {
-    }  // throw
     lexem = request_lexem();
     if (lexem.content != "(") {
     }  // throw
@@ -147,11 +147,176 @@ void If() {
         lexem = request_lexem();
         Operator();
     }
-    lexem = request_lexem();
-    // ??
 }
 
 void For() {
-    if (lexem.content != "for") {
-    }  // throw
+    lexem = request_lexem();
+    if (lexem.content != "(") {
+        // throw
+    }
+    lexem = request_lexem();
+    Variable_Initialization();
+    if (lexem.content != ";") {
+        // throw
+    }
+    lexem = request_lexem();
+    Expression();
+    if (lexem.content != ";") {
+        // throw
+    }
+    lexem = request_lexem();
+    Expression();
+    if (lexem.content != ")") {
+        // throw
+    }
+    lexem = request_lexem();
+    Operator();
+}
+
+void While() {
+    lexem = request_lexem();
+    if (lexem.content != "(") {
+        // throw
+    }
+    lexem = request_lexem();
+    Expression();
+    if (lexem.content != ")") {
+        // throw
+    }
+    lexem = request_lexem();
+    if (lexem.content != "do") {
+        // throw
+    }
+    lexem = request_lexem();
+    Operator();
+}
+
+void Input() {
+    lexem = request_lexem();
+    Variable();
+    while (lexem.content == ",") {
+        lexem = request_lexem();
+        Variable();
+    }
+    if (lexem.content != ";") {
+        // throw
+    }
+    lexem = request_lexem();
+}
+
+void Output() {
+    lexem = request_lexem();
+    Expression();
+    while (lexem.content == ",") {
+        lexem = request_lexem();
+        Expression();
+    }
+    if (lexem.content != ";") {
+        // throw
+    }
+    lexem = request_lexem();
+}
+
+void Match() {
+    lexem = request_lexem();
+    Name();
+    if (lexem.content != "{") {
+        // throw
+    }
+    lexem = request_lexem();
+    while (lexem.content != "}") {
+        Expression();
+        if (lexem.content != ">=") {
+            // throw
+        }
+        Operator();
+    }
+    lexem = request_lexem();
+}
+
+void Array_Declaration() {
+    Type();
+    Name();
+    if (lexem.content != "[") {
+        // throw
+    }
+    lexem = request_lexem();
+    if (lexem.content == "]") {
+        lexem = request_lexem();
+        Array_Declaration_Auto();
+    } else {
+        Array_Declaration_Exact();
+    }
+}
+
+void Array_Declaration_Auto() {
+    if (lexem.content != "=") {
+        // throw
+    }
+    lexem = request_lexem();
+    if (lexem.content != "{") {
+        // throw
+    }
+    lexem = request_lexem();
+    Literal();
+    while (lexem.content == ",") {
+        lexem = request_lexem();
+        Literal();
+    }
+    if (lexem.content != "}") {
+        // throw
+    }
+    lexem = request_lexem();
+    if (lexem.content != ";") {
+        // throw
+    }
+    lexem = request_lexem();
+}
+
+void Array_Declaration_Exact() {
+    Expression();
+    if (lexem.content != "]") {
+        // throw
+    }
+    lexem = request_lexem();
+    if (lexem.content == "=") {
+        lexem = request_lexem();
+        if (lexem.content != "{") {
+            // throw
+        }
+        lexem = request_lexem();
+        Literal();
+        while (lexem.content == ",") {
+            lexem = request_lexem();
+            Literal();
+        }
+        if (lexem.content != "}") {
+            // throw
+        }
+    }
+    if (lexem.content != ";") {
+        // throw
+    }
+    lexem = request_lexem();
+}
+
+void Array_Indexation() {
+    Name();
+    if (lexem.content != "[") {
+        // throw
+    }
+    lexem = request_lexem();
+    Expression();
+    if (lexem.content != "]") {
+        // throw
+    }
+    lexem = request_lexem();
+}
+
+void Literal() {
+    lexem = request_lexem();
+    if (lexem.content == "false" || lexem.content == "true") {
+        Boolean_Literal();
+    } else
+        Arithmetic_Literal();
 }
