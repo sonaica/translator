@@ -94,7 +94,7 @@
 
 <Or term> ::= <Arithmetic term>{<Or><Arithmetic term>}
 
-<Arithmetic term> ::= <Boolean literal> | <Arithmetic literal> | <Variable>
+<Arithmetic term> ::= <Boolean literal> | <Arithmetic literal> | <Variable> | "("<Arithmetic expression>")"
 
 <Arithmetic literal> ::= <Signed number> | <Signed number>.<Unsigned number>
 
