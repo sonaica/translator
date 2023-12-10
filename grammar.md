@@ -48,7 +48,7 @@
 
 <Sign> ::= + | -
 
-<Signed number> ::= <Sign><Digit>{<Digit>}|<Unsigned number>
+<Signed number> ::= <Sign><Unsigned number>|<Unsigned number>
 
 <Unsigned number> ::= <Digit> {<Digit>}
 ```
