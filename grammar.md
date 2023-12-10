@@ -58,7 +58,7 @@
 
 <Expression term>::= <Arithmetic logic expression>
 ```
-### Arithmetic, logic and comparison
+### Arithmetic, logic, comparison and assignment
 ```
 <Arithmetic logic expression> ::= <Unary term>
 
