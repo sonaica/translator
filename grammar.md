@@ -115,7 +115,6 @@
 <Equality operator> ::= == | !=
 
 <NonEquality operator> ::= > | < | >= | <=
-
 ```
 ### Operator
 ```
