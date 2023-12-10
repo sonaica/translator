@@ -40,7 +40,7 @@
 
 <Type> ::= void | int | double | bool
 
-<Variable Creation> ::= <Type> <Name> (= <Expression>) {, <Name> (= <Expression>)}
+<Variable Creation> ::= <Type> <Name> [= <Expression>] {, <Name> [= <Expression>]}
 
 <Variable Definition> ::= <Type> <Name> {, <Name>};
 
