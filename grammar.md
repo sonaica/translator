@@ -58,9 +58,9 @@
 
 <Expression term>::= <Arithmetic expression> | <Comparison expression> | <Function call> | <Assignment> | <Variable> | <Struct member>
 ```
-### Arithmetic and logic
+### Arithmetic, logic and comparison
 ```
-<Arithmetic expression> ::= <Unary term>
+<Arithmetic logic expression> ::= <Unary term>
 
 <Unary> ::= + | - | ++ | -- | ~
 
@@ -78,6 +78,10 @@
 
 <Shift> ::= << | >>
 
+<Equality operator> ::= == | !=
+
+<NonEquality operator> ::= > | < | >= | <=
+
 <Unary term> ::= <Unary><Unary term> | <Power term>
 
 <Power term> ::= <Mul term>{<Power><Mul term>}
@@ -86,7 +90,11 @@
 
 <Sum term> ::= <Shift term>{<Sum><Shift term>}
 
-<Shift term> ::= <And term>{<Shift><And term>}
+<Shift term> ::= <NonEquality term>{<Shift><NonEquality term>}
+
+<NonEquality term> ::= <Equality term>{<NonEquality operator><Equality term>}
+
+<Equality term> ::= <And term>{<Equality operator><And term>}
 
 <And term> ::= <Xor term>{<And><Xor term>}
 
@@ -99,22 +107,13 @@
 <Arithmetic literal> ::= <Signed number> | <Signed number>.<Unsigned number>
 
 <Boolean literal> ::= false | true
+
 ```
 ### Assignment
 ```
 <Assignment> ::= <Variable> <Assignment operator> <Expression>
 
 <Assignment operator> ::= = | <<= | >>= | += | -= | *= | **= | /= | //= | ^= | &= | |= | %=
-```
-### Comparison
-```
-<Comparison expression> ::= <Comparison Weak>{<Equality operator><Comparison Weak>}
-
-<Comparison Weak> ::= <Expression>{<NonEquality operator><Expression>}
-
-<Equality operator> ::= == | !=
-
-<NonEquality operator> ::= > | < | >= | <=
 ```
 ### Operator
 ```
