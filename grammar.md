@@ -78,9 +78,11 @@
 
 <Shift> ::= << | >>
 
-<Equality operator> ::= == | !=
+<Equality> ::= == | !=
 
-<NonEquality operator> ::= > | < | >= | <=
+<NonEquality> ::= > | < | >= | <=
+
+<Assignment> ::= = | <<= | >>= | += | -= | *= | **= | /= | //= | ^= | &= | |= | %=
 
 <Unary term> ::= <Unary><Unary term> | <Power term>
 
@@ -92,28 +94,23 @@
 
 <Shift term> ::= <NonEquality term>{<Shift><NonEquality term>}
 
-<NonEquality term> ::= <Equality term>{<NonEquality operator><Equality term>}
+<NonEquality term> ::= <Equality term>{<NonEquality><Equality term>}
 
-<Equality term> ::= <And term>{<Equality operator><And term>}
+<Equality term> ::= <And term>{<Equality><And term>}
 
 <And term> ::= <Xor term>{<And><Xor term>}
 
 <Xor term> ::= <Or term>{<Xor><Or term>}
 
-<Or term> ::= <Arithmetic term>{<Or><Arithmetic term>}
+<Or term> ::= <Assignment term>{<Or><Arithmetic term>}
+
+<Assignment term> ::= <Arithmetic term>{<Assignment><Arithmetic term>}
 
 <Arithmetic term> ::= <Boolean literal> | <Arithmetic literal> | <Variable> | "("<Arithmetic logic expression>")" | <Struct member> | <Function call>
 
 <Arithmetic literal> ::= <Signed number> | <Signed number>.<Unsigned number>
 
 <Boolean literal> ::= false | true
-
-```
-### Assignment
-```
-<Assignment> ::= <Variable> <Assignment operator> <Expression>
-
-<Assignment operator> ::= = | <<= | >>= | += | -= | *= | **= | /= | //= | ^= | &= | |= | %=
 ```
 ### Operator
 ```
