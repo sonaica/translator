@@ -56,7 +56,7 @@
 ```
 <Expression> ::= <Expression term> {, <Expression term> }
 
-<Expression term>::= <Arithmetic logic expression> | <Assignment>
+<Expression term>::= <Arithmetic logic expression>
 ```
 ### Arithmetic, logic and comparison
 ```
