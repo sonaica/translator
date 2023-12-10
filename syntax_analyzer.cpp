@@ -81,7 +81,7 @@ void Comparison() {
 }
 
 void Comparisons_Operators() {
-    if (lexem.content != ">" && lexem.content != "m" && lexem.content != ">=" &&
+    if (lexem.content != ">" && lexem.content != "<" && lexem.content != ">=" &&
         lexem.content != "<=" && lexem.content != "==" &&
         lexem.content != "!=") {
         // throw
