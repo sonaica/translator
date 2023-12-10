@@ -56,7 +56,7 @@
 ```
 <Expression> ::= <Expression term> {, <Expression term> }
 
-<Expression term>::= <Arithmetic logic expression> | <Function call> | <Assignment> | <Variable> | <Struct member>
+<Expression term>::= <Arithmetic logic expression> | <Assignment>
 ```
 ### Arithmetic, logic and comparison
 ```
@@ -102,7 +102,7 @@
 
 <Or term> ::= <Arithmetic term>{<Or><Arithmetic term>}
 
-<Arithmetic term> ::= <Boolean literal> | <Arithmetic literal> | <Variable> | "("<Arithmetic expression>")"
+<Arithmetic term> ::= <Boolean literal> | <Arithmetic literal> | <Variable> | "("<Arithmetic expression>")" | <Struct member> | <Function call>
 
 <Arithmetic literal> ::= <Signed number> | <Signed number>.<Unsigned number>
 
