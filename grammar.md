@@ -102,7 +102,7 @@
 
 <Or term> ::= <Arithmetic term>{<Or><Arithmetic term>}
 
-<Arithmetic term> ::= <Boolean literal> | <Arithmetic literal> | <Variable> | "("<Arithmetic expression>")" | <Struct member> | <Function call>
+<Arithmetic term> ::= <Boolean literal> | <Arithmetic literal> | <Variable> | "("<Arithmetic logic expression>")" | <Struct member> | <Function call>
 
 <Arithmetic literal> ::= <Signed number> | <Signed number>.<Unsigned number>
 
