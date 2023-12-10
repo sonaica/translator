@@ -56,7 +56,7 @@
 ```
 <Expression> ::= <Expression term> {, <Expression term> }
 
-<Expression term>::= <Arithmetic expression> | <Comparison expression> | <Function call> | <Assignment> | <Variable> | <Struct member>
+<Expression term>::= <Arithmetic logic expression> | <Function call> | <Assignment> | <Variable> | <Struct member>
 ```
 ### Arithmetic, logic and comparison
 ```
