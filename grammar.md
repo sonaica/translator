@@ -56,7 +56,7 @@
 ```
 <Expression> ::= <Expression term> {, <Expression term> }
 
-<Expression term>::= <Arithmetic expression> | <Comparison> | <Function call> | <Assignment> | <Variable> | <Struct member>
+<Expression term>::= <Arithmetic expression> | <Comparison expression> | <Function call> | <Assignment> | <Variable> | <Struct member>
 ```
 ### Arithmetic and logic
 ```
@@ -108,9 +108,14 @@
 ```
 ### Comparison
 ```
-<Comparison> ::= <Expression> <Comparison operators> <Expression>
+<Comparison expression> ::= <Comparison Weak>{<Equality operator><Comparison Weak>}
 
-<Comparison operators> ::= > | < | >= | <= | == | != 
+<Comparison Weak> ::= <Expression>{<NonEquality operator><Expression>}
+
+<Equality operator> ::= == | !=
+
+<NonEquality operator> ::= > | < | >= | <=
+
 ```
 ### Operator
 ```
