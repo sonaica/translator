@@ -8,7 +8,7 @@
 ```
 ### Functions
 ```
-<Function definition> ::= fun <Name> <Function parameters> <Type>  ‘{‘ <Operator> return <Expression>‘}’
+<Function definition> ::= fun <Name> <Function parameters> <Type>  ‘{‘ <Operator> ‘}’
 
 <Function parameters> ::= "(" <Type> <Name> {, <Type> <Name> } ")"
 
@@ -116,7 +116,7 @@
 ```
 ### Operator
 ```
-<Operator>::= "{" { <Operator> } "}" | <If> | <For> | <While> | <Input>; | <Output>; | <Expression>; | <Variable creation>; | <Match>
+<Operator>::= "{" { <Operator> } "}" | <If> | <For> | <While> | <Input>; | <Output>; | <Expression>; | <Variable creation>; | <Match> | return <Expression>;
 ```
 ### Conditional operator
 ```
