@@ -126,7 +126,7 @@
 ```
 <For>::= for "("<Variable Initialization>; <Expression>; <Expression>")" <Operator>
 
-<While>::= while "(" <Expression> ")" do <Operator>
+<While>::= while "(" <Expression> ")" <Operator>
 ```
 ### Input and Output
 ```
