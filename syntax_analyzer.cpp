@@ -35,7 +35,7 @@ void ReadFile(std::string file, std::vector<char> &text) {
 void GetLexem() {
     Verdict verdict = FSM();
     if (!verdict.is_error) {
-        verdict.lexem;
+        lexem = verdict.lexem;
         return;
     }
     if (verdict.type == 1) {
@@ -88,11 +88,7 @@ void Program() {
     GetLexem();
     if (lexem.content != ")") throw UndefinedMainFunctionError();
     GetLexem();
-    if (lexem.content != "{") throw UndefinedMainFunctionError();
-    GetLexem();
     Operator();
-    if (lexem.content != "}") throw UndefinedMainFunctionError();
-    GetLexem();
 }
 
 void Directive() {
@@ -102,12 +98,16 @@ void Directive() {
             lexem.content.back() != '\"')
             throw InvalidFilename();
         GetLexem();
+        if (lexem.content != ";") throw MissingSemicolumn();
+        GetLexem();
         return;
     }
     if (lexem.content == "define") {
         GetLexem();
         String();
         String();
+        if (lexem.content != ";") throw MissingSemicolumn();
+        GetLexem();
         return;
     }
 }
@@ -225,11 +225,11 @@ void Name() {
     for (int ind = 1; ind < lexem.content.size(); ++ind)
         if (!Letter(lexem.content[ind]) && !Digit(lexem.content[ind]))
             throw InvalidSymbol();
+    GetLexem();
 }
 
 void Variable() {
     Name();
-    GetLexem();
     if (lexem.content == "[") {
         Expression();
         if (lexem.content != "]") throw InvalidArrayIndexation();
@@ -245,20 +245,26 @@ bool Type() {
     return false;
 }
 
-void VariableCreation() {
+void EntityCreation() {
     Type();
     Name();
+    if (lexem.content == "[") {
+        GetLexem();
+        ArrayDeclaration();
+        return;
+    }
     if (lexem.content == "=") {
         GetLexem();
         Expression();
+        return;
     }
+}
+
+void VariableCreation() {
+    EntityCreation();
     while (lexem.content == ",") {
         GetLexem();
-        Name();
-        if (lexem.content == "=") {
-            GetLexem();
-            Expression();
-        }
+        EntityCreation();
     }
     if (lexem.content != ";") throw InvalidVariableCreation();
     GetLexem();
@@ -402,7 +408,7 @@ bool Assignment() {
 }
 
 void UnaryTerm() {
-    if (Sign()) {
+    if (Unary()) {
         UnaryTerm();
     } else {
         PowerTerm();
@@ -484,6 +490,7 @@ void ArithmeticTerm() {
         GetLexem();
         ArithmeticExpression();
         if (lexem.content != ")") throw InvalidArithmeticTerm();
+        GetLexem();
         return;
     }
     if (!BooleanLiteral() && !ArithmeticLiteral()) {
@@ -533,43 +540,51 @@ void Operator() {
             Operator();
         }
     } else {
-        GetLexem();
         if (lexem.content == "if") {
+            GetLexem();
             If();
+            return;
         }
         if (lexem.content == "while") {
+            GetLexem();
             While();
+            return;
         }
         if (lexem.content == "for") {
+            GetLexem();
             For();
+            return;
         }
         if (lexem.content == "input") {
+            GetLexem();
             Input();
+            return;
         }
         if (lexem.content == "output") {
+            GetLexem();
             Output();
+            return;
         }
         if (lexem.content == "match") {
+            GetLexem();
             Match();
+            return;
         }
         if (lexem.content == "int" || lexem.content == "void" ||
-            lexem.content == "bool") {
+            lexem.content == "bool" || lexem.content == "double") {
             VariableCreation();
-            if (lexem.content != ";") {
-                throw MissingSemicolumn();
-            }
-        } else {
-            Expression();
-            if (lexem.content != ";") {
-                throw MissingSemicolumn();
-            }
+            return;
         }
+        Expression();
+        if (lexem.content != ";") {
+            throw MissingSemicolumn();
+        }
+        GetLexem();
     }
-    GetLexem();
+    // GetLexem();
 }
 
 void If() {
-    GetLexem();
     if (lexem.content != "(") {
         throw ExpectedOpenParenthesis();
     }
@@ -587,16 +602,11 @@ void If() {
 }
 
 void For() {
-    GetLexem();
     if (lexem.content != "(") {
         throw ExpectedOpenParenthesis();
     }
     GetLexem();
     VariableCreation();
-    if (lexem.content != ";") {
-        throw MissingSemicolumn();
-    }
-    GetLexem();
     Expression();
     if (lexem.content != ";") {
         throw MissingSemicolumn();
@@ -611,7 +621,6 @@ void For() {
 }
 
 void While() {
-    GetLexem();
     if (lexem.content != "(") {
         throw ExpectedOpenParenthesis();
     }
@@ -621,15 +630,10 @@ void While() {
         throw ExpectedCloseParenthesis();
     }
     GetLexem();
-    if (lexem.content != "do") {
-        throw ExpectedDo();
-    }
-    GetLexem();
     Operator();
 }
 
 void Input() {
-    GetLexem();
     Variable();
     while (lexem.content == ",") {
         GetLexem();
@@ -642,7 +646,6 @@ void Input() {
 }
 
 void Output() {
-    GetLexem();
     Expression();
     while (lexem.content == ",") {
         GetLexem();
@@ -655,7 +658,6 @@ void Output() {
 }
 
 void Match() {
-    GetLexem();
     Name();
     if (lexem.content != "{") {
         throw ExpectedFigureOpen();
@@ -672,12 +674,6 @@ void Match() {
 }
 
 void ArrayDeclaration() {
-    Type();
-    Name();
-    if (lexem.content != "[") {
-        throw ExpectedSquareOpen();
-    }
-    GetLexem();
     if (lexem.content == "]") {
         GetLexem();
         ArrayDeclarationAuto();

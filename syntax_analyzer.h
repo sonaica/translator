@@ -42,6 +42,7 @@ bool Letter(char c);
 bool SpecialSymbol(char c);
 bool Digit(char c);
 bool Type();
+void EntityCreation();
 void VariableCreation();
 
 // void VariableDefinition();

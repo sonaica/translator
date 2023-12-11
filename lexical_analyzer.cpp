@@ -7,7 +7,7 @@
 
 Vertex *root = new Vertex();
 
-extern std::vector<char>text;
+extern std::vector<char> text;
 extern int pos;
 extern int lines;
 
@@ -119,6 +119,11 @@ Verdict FSM() {
                     verdict_return.lexem = create_lexem(current_lexem, 6);
                     return verdict_return;
                 } else if (cur == '(' || cur == ')') {
+                    current_lexem += cur;
+                    ++pos;
+                    verdict_return.lexem = create_lexem(current_lexem, 7);
+                    return verdict_return;
+                } else if (cur == '[' || cur == '}') {
                     current_lexem += cur;
                     ++pos;
                     verdict_return.lexem = create_lexem(current_lexem, 7);

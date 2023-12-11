@@ -40,11 +40,13 @@
 
 <Type> ::= void | int | double | bool
 
-<Variable Creation> ::= <Type> <Name> [= <Expression>] {, <Name> [= <Expression>]}
+<Entity Creation> ::= <Type> <Name> [= <Expression>] | <Array declaration>
 
-<Variable Definition> ::= <Type> <Name> {, <Name>};
+<Variable Creation> ::= <Entity Creation> {, <Entity Creation>};
 
-<Variable Initialization> ::= <Type> {<Name> = <Expression>, } <Name> = <Expression>;
+//<Variable Definition> ::= <Type> <Name> {, <Name>};
+
+//<Variable Initialization> ::= <Type> {<Name> = <Expression>, } <Name> = <Expression>;
 
 <Sign> ::= + | -
 
@@ -124,7 +126,7 @@
 ```
 <For>::= for "("<Variable Initialization>; <Expression>; <Expression>")" <Operator>
 
-<While>::= while "(" <Expression> ")" do <Operator>
+<While>::= while "(" <Expression> ")" <Operator>
 ```
 ### Input and Output
 ```
