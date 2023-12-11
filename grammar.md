@@ -40,9 +40,7 @@
 
 <Type> ::= void | int | double | bool
 
-<Variable Creation One> ::= <Type> <Name> [= <Expression>]
-
-<Entity Creation> ::= <Variable Creation One> | <Array declaration>
+<Entity Creation> ::= <Type> <Name> [= <Expression>] | <Array declaration>
 
 <Variable Creation> ::= <Entity Creation> {, <Entity Creation>};
 
