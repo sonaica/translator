@@ -48,7 +48,7 @@ bool is_keyword(std::string keyword) {
     auto v = root;
     for (int i = 0; i < keyword.length(); ++i) {
         if (v == nullptr) return false;
-        v = v->to[keyword[i] - 'a'];
+        v = v->to[keyword[i]];
     }
     if (v != nullptr && v->terminal) return true;
     return false;

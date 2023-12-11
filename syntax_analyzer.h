@@ -104,6 +104,7 @@ void While();
 
 void Input();
 void Output();
+void OutputItem();
 
 // Arrays
 

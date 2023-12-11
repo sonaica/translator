@@ -9,7 +9,6 @@
 #include "lexical_analyzer.h"
 extern std::vector<char> text;
 extern int pos;
-extern int lines;
 extern Lexem lexem;
 
 Verdict verdict;
@@ -122,11 +121,9 @@ void FunctionDefinition() {
     Type();
     if (lexem.content != "{") throw InvalidFunctionDefinition();
     GetLexem();
-    Operator();
-    if (lexem.content != "return") throw InvalidFunctionDefinition();
-    GetLexem();
-    Expression();
-    if (lexem.content != "}") throw InvalidFunctionDefinition();
+    while (lexem.content != "}") {
+        Operator();
+    }
     GetLexem();
 }
 
@@ -152,10 +149,10 @@ void FunctionCall() {
 void ArgumentList() {
     if (lexem.content != "(") throw InvalidArgumentList();
     GetLexem();
-    Name();
+    Expression();
     while (lexem.content == ",") {
         GetLexem();
-        Name();
+        Expression();
     }
     if (lexem.content != ")") throw InvalidArgumentList();
     GetLexem();
@@ -217,7 +214,9 @@ bool Letter(char c) {
 
 bool Digit(char c) { return ('0' <= c && c <= '9'); }
 
-bool SpecialSymbol(char c) { return c == '_' || c == '/'; }
+bool SpecialSymbol(char c) {
+    return c == '_' || c == '/' || c == '\"' || c == ',' || c == ' ';
+}
 
 void Name() {
     if (lexem.content.empty()) throw InvalidName();
@@ -231,8 +230,10 @@ void Name() {
 void Variable() {
     Name();
     if (lexem.content == "[") {
+        GetLexem();
         Expression();
         if (lexem.content != "]") throw InvalidArrayIndexation();
+        GetLexem();
     }
 }
 
@@ -282,7 +283,6 @@ bool SignedNumber() {
     if (!Sign()) {
         return UnsignedNumber();
     } else {
-        GetLexem();
         return UnsignedNumber();
     }
 }
@@ -508,6 +508,7 @@ void ArithmeticTerm() {
             return;
         }
         if (lexem.content == "[") {
+            GetLexem();
             Expression();
             if (lexem.content != "]") throw InvalidArrayIndexation();
             GetLexem();
@@ -539,6 +540,7 @@ void Operator() {
         while (lexem.content != "}") {
             Operator();
         }
+        GetLexem();
     } else {
         if (lexem.content == "if") {
             GetLexem();
@@ -570,6 +572,13 @@ void Operator() {
             Match();
             return;
         }
+        if (lexem.content == "return") {
+            GetLexem();
+            Expression();
+            if (lexem.content != ";") throw MissingSemicolumn();
+            GetLexem();
+            return;
+        }
         if (lexem.content == "int" || lexem.content == "void" ||
             lexem.content == "bool" || lexem.content == "double") {
             VariableCreation();
@@ -581,7 +590,6 @@ void Operator() {
         }
         GetLexem();
     }
-    // GetLexem();
 }
 
 void If() {
@@ -646,15 +654,24 @@ void Input() {
 }
 
 void Output() {
-    Expression();
+    OutputItem();
     while (lexem.content == ",") {
         GetLexem();
-        Expression();
+        OutputItem();
     }
     if (lexem.content != ";") {
         throw MissingSemicolumn();
     }
     GetLexem();
+}
+
+void OutputItem() {
+    if (lexem.content[0] == '\"' && lexem.content.back() == '\"') {
+        String();
+        return;
+    }
+    if (lexem.content[0] == '\"') throw InvalidStringLiteral();
+    Expression();
 }
 
 void Match() {
@@ -745,7 +762,6 @@ void ArrayIndexation() {
 }
 
 void Literal() {
-    GetLexem();
     if (lexem.content == "false" || lexem.content == "true") {
         BooleanLiteral();
     } else

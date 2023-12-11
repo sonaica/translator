@@ -183,3 +183,9 @@ class ImpossibleLexem : public SyntaxError {
     ImpossibleLexem();
     virtual ~ImpossibleLexem();
 };
+
+class InvalidStringLiteral : public SyntaxError {
+   public:
+    InvalidStringLiteral();
+    virtual ~InvalidStringLiteral();
+};

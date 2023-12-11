@@ -15,7 +15,7 @@ Lexem lexem;
 
 int main() {
     // std::cout << "Enter the name of file: ";
-    std::string file_in = "in.txt", file_out = "out.txt";
+    std::string file_in = "in1.txt", file_out = "out.txt";
     const std::string file_keywords = "keywords.txt";
     CreateBor(file_keywords);
     ReadFile(file_in, text);
@@ -24,6 +24,7 @@ int main() {
         GetLexem();
         Program();
     } catch (SyntaxError& e) {
+        if (lexem.content == "}") --lines;
         std::cout << "in line " << lines << ": ";
         e.what();
         return 1;

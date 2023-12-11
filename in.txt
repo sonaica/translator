@@ -1,5 +1,5 @@
 import "math.h";
-define for forn;
+define for fon;
 
 struct cool_struct {} bob;
 
@@ -16,7 +16,7 @@ main() {
             r = mid;
         }
     }
-    if (a == a[x]) {
+    if (a == x) {
         output "Haleluyah";
     } else {
         output "aw man";

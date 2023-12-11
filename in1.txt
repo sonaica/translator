@@ -1,0 +1,33 @@
+import "pretty_cool_file.h";
+import "C\triple\downtown_funk.cpp";
+define make_pair mp;
+
+int N = 100000;
+int n;
+int p[n];
+
+fun max(int a, int b) int {
+    if (a < b) {
+        return b;
+    }
+    return a;
+}
+
+struct my_struct{
+    int a, b;
+    fun sum(int a, int b) int {
+        return a + b;
+    }
+} str,jui;
+
+main() {
+    input n;
+    for (int i = 0; i < n; i)
+        input p[i];
+        
+    int value = -1000000000;
+    for (int i = 0; i < n; ++i) {
+        value = max(value, p[i])=9;
+    }
+    output value;
+}

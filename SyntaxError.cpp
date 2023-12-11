@@ -163,3 +163,8 @@ ImpossibleLexem::ImpossibleLexem()
     : SyntaxError("Error: impossible to allocate a lexem"){};
 
 ImpossibleLexem::~ImpossibleLexem() = default;
+
+InvalidStringLiteral::InvalidStringLiteral()
+    : SyntaxError("Error: invalid string literal"){};
+
+InvalidStringLiteral::~InvalidStringLiteral() = default;
