@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "SyntaxError.h"
 #include "lexical_analyzer.h"
-
 extern std::vector<char> text;
 extern int pos;
 extern int lines;
@@ -32,10 +32,10 @@ void ReadFile(std::string file, std::vector<char> &text) {
     }
 }
 
-Lexem request_lexem() {
+void GetLexem() {
     Verdict verdict = FSM();
     if (!verdict.is_error) {
-        return verdict.lexem;
+        verdict.lexem;
     }
     throw verdict;
 }
@@ -57,48 +57,478 @@ Lexem request_lexem() {
 //     out.close();
 // }
 
-void Assignment() {
-    Variable();
-    Assignment_Operator();
-    Expression();
-}
+// Program Structure
 
-void Assignment_Operator() {
-    if (lexem.content != "=" && lexem.content != "<<=" &&
-        lexem.content != ">>=" && lexem.content != "+=" &&
-        lexem.content != "-=" && lexem.content != "*=" &&
-        lexem.content != "**=" && lexem.content != "/=" &&
-        lexem.content != "//=" && lexem.content != "^=" &&
-        lexem.content != "&=" && lexem.content != "|=" &&
-        lexem.content != "%=") {
-        // throw
+void Program() {
+    for (;;) {
+        if (lexem.content == "import" || lexem.content == "define")
+            Directive();
+        else
+            break;
     }
-    lexem = request_lexem();
-}
-
-void Comparison() {
-    Expression();
-    Comparisons_Operators();
-    Expression();
-}
-
-void Comparisons_Operators() {
-    if (lexem.content != ">" && lexem.content != "<" && lexem.content != ">=" &&
-        lexem.content != "<=" && lexem.content != "==" &&
-        lexem.content != "!=") {
-        // throw
+    for (;;) {
+        if (lexem.content == "fun") {
+            FunctionDefinition();
+        } else if (lexem.content == "struct") {
+            StructDefinition();
+        } else if (Type()) {
+            VariableCreation();
+        } else {
+            break;
+        }
     }
-    lexem = request_lexem();
+    if (lexem.content != "main") throw UndefinedMainFunctionError();
+    GetLexem();
+    if (lexem.content != "(") throw UndefinedMainFunctionError();
+    GetLexem();
+    if (lexem.content != ")") throw UndefinedMainFunctionError();
+    GetLexem();
+    if (lexem.content != "{") throw UndefinedMainFunctionError();
+    GetLexem();
+    Operator();
+    if (lexem.content != "}") throw UndefinedMainFunctionError();
+    GetLexem();
+}
+
+void Directive() {
+    if (lexem.content == "import") {
+        GetLexem();
+        if (lexem.content.size() <= 2 || lexem.content[0] != '\"' ||
+            lexem.content.back() != '\"')
+            throw InvalidFilename();
+        GetLexem();
+        return;
+    }
+    if (lexem.content == "define") {
+        GetLexem();
+        String();
+        String();
+        return;
+    }
+}
+
+// Functions
+
+void FunctionDefinition() {
+    if (lexem.content != "fun") throw InvalidFunctionDefinition();
+    GetLexem();
+    Name();
+    FunctionParameters();
+    Type();
+    if (lexem.content != "{") throw InvalidFunctionDefinition();
+    GetLexem();
+    Operator();
+    if (lexem.content != "return") throw InvalidFunctionDefinition();
+    GetLexem();
+    Expression();
+    if (lexem.content != "}") throw InvalidFunctionDefinition();
+    GetLexem();
+}
+
+void FunctionParameters() {
+    if (lexem.content != "(") throw UndefinedFunctionParameters();
+    GetLexem();
+    Type();
+    Name();
+    while (lexem.content == ",") {
+        GetLexem();
+        Type();
+        Name();
+    }
+    if (lexem.content != ")") throw UndefinedFunctionParameters();
+    GetLexem();
+}
+
+void FunctionCall() {
+    Name();
+    ArgumentList();
+}
+
+void ArgumentList() {
+    if (lexem.content != "(") throw InvalidArgumentList();
+    GetLexem();
+    Name();
+    while (lexem.content == ",") {
+        GetLexem();
+        Name();
+    }
+    if (lexem.content != ")") throw InvalidArgumentList();
+    GetLexem();
+}
+
+// Structures
+
+void StructDefinition() {
+    if (lexem.content != "struct") throw InvalidStructDefinition();
+    GetLexem();
+    Name();
+    if (lexem.content != "{") throw InvalidStructDefinition();
+    GetLexem();
+    for (;;) {
+        if (lexem.content == "fun")
+            FunctionDefinition();
+        else if (Type())
+            VariableCreation();
+        else
+            break;
+    }
+    if (lexem.content != "}") throw InvalidStructDefinition();
+    GetLexem();
+    Name();
+    while (lexem.content == ",") {
+        GetLexem();
+        Name();
+    }
+    if (lexem.content != ";") throw InvalidStructDefinition();
+    GetLexem();
+}
+
+void StructMember() {
+    Name();
+    if (lexem.content != ".") throw InvalidStructMember();
+    GetLexem();
+    Name();
+    if (lexem.content == "(") {
+        ArgumentList();
+    }
+}
+
+// Types and variables
+
+void String() {
+    for (char c : lexem.content) {
+        Symbol(c);
+    }
+    GetLexem();
+}
+
+void Symbol(char c) {
+    if (!Letter(c) && !Digit(c)) throw InvalidSymbol();
+}
+
+bool Letter(char c) {
+    return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || SpecialSymbol(c);
+}
+
+bool Digit(char c) { return ('0' <= c && c <= '9'); }
+
+bool SpecialSymbol(char c) { return c == '_' || c == '/'; }
+
+void Name() {
+    if (lexem.content.empty()) throw InvalidName();
+    if (Digit(lexem.content[0])) throw InvalidName();
+    for (int ind = 1; ind < lexem.content.size(); ++ind)
+        if (!Letter(lexem.content[ind]) && !Digit(lexem.content[ind]))
+            throw InvalidSymbol();
+}
+
+void Variable() {
+    Name();
+    GetLexem();
+    if (lexem.content == "[") {
+        Expression();
+        if (lexem.content != "]") throw InvalidArrayIndexation();
+    }
+}
+
+bool Type() {
+    for (const std::string &s : TypeList)
+        if (lexem.content == s) {
+            GetLexem();
+            return true;
+        }
+    return false;
+}
+
+void VariableCreation() {
+    Type();
+    Name();
+    if (lexem.content == "=") {
+        GetLexem();
+        Expression();
+    }
+    while (lexem.content == ",") {
+        GetLexem();
+        Name();
+        if (lexem.content == "=") {
+            GetLexem();
+            Expression();
+        }
+    }
+    if (lexem.content != ";") throw InvalidVariableCreation();
+    GetLexem();
+}
+
+bool Sign() {
+    if (lexem.content == "+" || lexem.content == "-") {
+        GetLexem();
+        return true;
+    }
+    return false;
+}
+
+bool SignedNumber() {
+    if (!Sign()) {
+        return UnsignedNumber();
+    } else {
+        GetLexem();
+        return UnsignedNumber();
+    }
+}
+
+bool UnsignedNumber() {
+    for (char c : lexem.content) {
+        if (!Digit(c)) return false;
+    }
+    GetLexem();
+    return true;
+}
+
+// Expression
+
+void Expression() {
+    ExpressionTerm();
+    while (lexem.content == ",") {
+        GetLexem();
+        ExpressionTerm();
+    }
+}
+
+void ExpressionTerm() { ArithmeticExpression(); }
+
+// Arithmetic, logic and comparison
+
+void ArithmeticExpression() { UnaryTerm(); }
+
+bool Unary() {
+    if (lexem.content == "+" || lexem.content == "-" || lexem.content == "++" ||
+        lexem.content == "--" || lexem.content == "~") {
+        GetLexem();
+        return true;
+    }
+    return false;
+}
+
+bool Mul() {
+    if (lexem.content == "*" || lexem.content == "/" || lexem.content == "%") {
+        GetLexem();
+        return true;
+    }
+    return false;
+}
+
+bool Sum() {
+    if (lexem.content == "+" || lexem.content == "-") {
+        GetLexem();
+        return true;
+    }
+    return false;
+}
+
+bool Power() {
+    if (lexem.content == "**") {
+        GetLexem();
+        return true;
+    }
+    return false;
+}
+
+bool And() {
+    if (lexem.content == "&" || lexem.content == "and") {
+        GetLexem();
+        return true;
+    }
+    return false;
+}
+
+bool Xor() {
+    if (lexem.content == "^") {
+        GetLexem();
+        return true;
+    }
+    return false;
+}
+
+bool Or() {
+    if (lexem.content == "|" || lexem.content == "or") {
+        GetLexem();
+        return true;
+    }
+    return false;
+}
+
+bool Shift() {
+    if (lexem.content == "<<" || lexem.content == ">>") {
+        GetLexem();
+        return true;
+    }
+    return false;
+}
+
+bool Equality() {
+    if (lexem.content == "==" || lexem.content == "!=") {
+        GetLexem();
+        return true;
+    }
+    return false;
+}
+
+bool NonEquality() {
+    if (lexem.content == "<" || lexem.content == ">" || lexem.content == "<=" ||
+        lexem.content == ">=") {
+        GetLexem();
+        return true;
+    }
+    return false;
+}
+
+bool Assignment() {
+    if (lexem.content == "=" || lexem.content == "<<=" ||
+        lexem.content == ">>=" || lexem.content == "+=" ||
+        lexem.content == "-=" || lexem.content == "*=" ||
+        lexem.content == "**=" || lexem.content == "/=" ||
+        lexem.content == "//=" || lexem.content == "^=" ||
+        lexem.content == "&=" || lexem.content == "|=" ||
+        lexem.content == "%=") {
+        GetLexem();
+        return true;
+    }
+    return false;
+}
+
+void UnaryTerm() {
+    if (Sign()) {
+        UnaryTerm();
+    } else {
+        PowerTerm();
+    }
+}
+
+void PowerTerm() {
+    MulTerm();
+    while (Power()) {
+        MulTerm();
+    }
+}
+
+void MulTerm() {
+    SumTerm();
+    while (Mul()) {
+        SumTerm();
+    }
+}
+
+void SumTerm() {
+    ShiftTerm();
+    while (Sum()) {
+        ShiftTerm();
+    }
+}
+
+void ShiftTerm() {
+    NonEqualityTerm();
+    while (Shift()) {
+        NonEqualityTerm();
+    }
+}
+
+void NonEqualityTerm() {
+    EqualityTerm();
+    while (NonEquality()) {
+        EqualityTerm();
+    }
+}
+
+void EqualityTerm() {
+    AndTerm();
+    while (Equality()) {
+        AndTerm();
+    }
+}
+
+void AndTerm() {
+    XorTerm();
+    while (And()) {
+        XorTerm();
+    }
+}
+
+void XorTerm() {
+    OrTerm();
+    while (Xor()) {
+        OrTerm();
+    }
+}
+
+void OrTerm() {
+    AssignmentTerm();
+    while (Or()) {
+        AssignmentTerm();
+    }
+}
+
+void AssignmentTerm() {
+    ArithmeticTerm();
+    while (Assignment()) {
+        ArithmeticTerm();
+    }
+}
+
+void ArithmeticTerm() {
+    if (lexem.content == "(") {
+        GetLexem();
+        ArithmeticExpression();
+        if (lexem.content != ")") throw InvalidArithmeticTerm();
+        return;
+    }
+    if (!BooleanLiteral() && !ArithmeticLiteral()) {
+        Name();
+        if (lexem.content == "(") {
+            ArgumentList();
+            return;
+        }
+        if (lexem.content == ".") {
+            GetLexem();
+            Name();
+            if (lexem.content == "(") {
+                ArgumentList();
+            }
+            return;
+        }
+        if (lexem.content == "[") {
+            Expression();
+            if (lexem.content != "]") throw InvalidArrayIndexation();
+            GetLexem();
+            return;
+        }
+    }
+}
+
+bool BooleanLiteral() {
+    if (lexem.content == "true" || lexem.content == "false") {
+        GetLexem();
+        return true;
+    }
+    return false;
+}
+
+bool ArithmeticLiteral() {
+    if (!SignedNumber()) return false;
+    if (lexem.content == ".") {
+        GetLexem();
+        if (!UnsignedNumber()) throw InvalidArithmeticLiteral();
+    }
+    return true;
 }
 
 void Operator() {
     if (lexem.content == "{") {
-        lexem = request_lexem();
+        GetLexem();
         while (lexem.content != "}") {
             Operator();
         }
     } else {
-        lexem = request_lexem();
+        GetLexem();
         if (lexem.content == "if") {
             If();
         }
@@ -119,204 +549,206 @@ void Operator() {
         }
         if (lexem.content == "int" || lexem.content == "void" ||
             lexem.content == "bool") {
-            Variable_Creation();
+            VariableCreation();
             if (lexem.content != ";") {
-                // throw
+                throw MissingSemicolumn();
             }
         } else {
             Expression();
             if (lexem.content != ";") {
-                // throw
+                throw MissingSemicolumn();
             }
         }
     }
-    lexem = request_lexem();
+    GetLexem();
 }
 
 void If() {
-    lexem = request_lexem();
+    GetLexem();
     if (lexem.content != "(") {
-    }  // throw
-    lexem = request_lexem();
+        throw ExpectedOpenParenthesis();
+    }
+    GetLexem();
     Expression();
     if (lexem.content != ")") {
-    }  // throw
-    lexem = request_lexem();
+        throw ExpectedCloseParenthesis();
+    }
+    GetLexem();
     Operator();
     if (lexem.content == "else") {
-        lexem = request_lexem();
+        GetLexem();
         Operator();
     }
 }
 
 void For() {
-    lexem = request_lexem();
+    GetLexem();
     if (lexem.content != "(") {
-        // throw
+        throw ExpectedOpenParenthesis();
     }
-    lexem = request_lexem();
-    Variable_Initialization();
+    GetLexem();
+    VariableCreation();
     if (lexem.content != ";") {
-        // throw
+        throw MissingSemicolumn();
     }
-    lexem = request_lexem();
+    GetLexem();
     Expression();
     if (lexem.content != ";") {
-        // throw
+        throw MissingSemicolumn();
     }
-    lexem = request_lexem();
+    GetLexem();
     Expression();
     if (lexem.content != ")") {
-        // throw
+        throw ExpectedCloseParenthesis();
     }
-    lexem = request_lexem();
+    GetLexem();
     Operator();
 }
 
 void While() {
-    lexem = request_lexem();
+    GetLexem();
     if (lexem.content != "(") {
-        // throw
+        throw ExpectedOpenParenthesis();
     }
-    lexem = request_lexem();
+    GetLexem();
     Expression();
     if (lexem.content != ")") {
-        // throw
+        throw ExpectedCloseParenthesis();
     }
-    lexem = request_lexem();
+    GetLexem();
     if (lexem.content != "do") {
-        // throw
+        throw ExpectedDo();
     }
-    lexem = request_lexem();
+    GetLexem();
     Operator();
 }
 
 void Input() {
-    lexem = request_lexem();
+    GetLexem();
     Variable();
     while (lexem.content == ",") {
-        lexem = request_lexem();
+        GetLexem();
         Variable();
     }
     if (lexem.content != ";") {
-        // throw
+        throw MissingSemicolumn();
     }
-    lexem = request_lexem();
+    GetLexem();
 }
 
 void Output() {
-    lexem = request_lexem();
+    GetLexem();
     Expression();
     while (lexem.content == ",") {
-        lexem = request_lexem();
+        GetLexem();
         Expression();
     }
     if (lexem.content != ";") {
-        // throw
+        throw MissingSemicolumn();
     }
-    lexem = request_lexem();
+    GetLexem();
 }
 
 void Match() {
-    lexem = request_lexem();
+    GetLexem();
     Name();
     if (lexem.content != "{") {
-        // throw
+        throw ExpectedFigureOpen();
     }
-    lexem = request_lexem();
+    GetLexem();
     while (lexem.content != "}") {
         Expression();
         if (lexem.content != ">=") {
-            // throw
+            throw ExpectedMatch();
         }
         Operator();
     }
-    lexem = request_lexem();
+    GetLexem();
 }
 
-void Array_Declaration() {
+void ArrayDeclaration() {
     Type();
     Name();
     if (lexem.content != "[") {
-        // throw
+        throw ExpectedSquareOpen();
     }
-    lexem = request_lexem();
+    GetLexem();
     if (lexem.content == "]") {
-        lexem = request_lexem();
-        Array_Declaration_Auto();
+        GetLexem();
+        ArrayDeclarationAuto();
     } else {
-        Array_Declaration_Exact();
+        ArrayDeclarationExact();
     }
 }
 
-void Array_Declaration_Auto() {
+void ArrayDeclarationAuto() {
     if (lexem.content != "=") {
-        // throw
+        throw ExpectedEqual();
     }
-    lexem = request_lexem();
+    GetLexem();
     if (lexem.content != "{") {
-        // throw
+        throw ExpectedFigureOpen();
     }
-    lexem = request_lexem();
+    GetLexem();
     Literal();
     while (lexem.content == ",") {
-        lexem = request_lexem();
+        GetLexem();
         Literal();
     }
     if (lexem.content != "}") {
-        // throw
+        throw ExpectedFigureClose();
     }
-    lexem = request_lexem();
+    GetLexem();
     if (lexem.content != ";") {
-        // throw
+        throw MissingSemicolumn();
     }
-    lexem = request_lexem();
+    GetLexem();
 }
 
-void Array_Declaration_Exact() {
+void ArrayDeclarationExact() {
     Expression();
     if (lexem.content != "]") {
-        // throw
+        throw ExpectedSquareClose();
     }
-    lexem = request_lexem();
+    GetLexem();
     if (lexem.content == "=") {
-        lexem = request_lexem();
+        GetLexem();
         if (lexem.content != "{") {
-            // throw
+            throw ExpectedFigureOpen();
         }
-        lexem = request_lexem();
+        GetLexem();
         Literal();
         while (lexem.content == ",") {
-            lexem = request_lexem();
+            GetLexem();
             Literal();
         }
         if (lexem.content != "}") {
-            // throw
+            throw ExpectedFigureClose();
         }
     }
     if (lexem.content != ";") {
-        // throw
+        throw MissingSemicolumn();
     }
-    lexem = request_lexem();
+    GetLexem();
 }
 
-void Array_Indexation() {
+void ArrayIndexation() {
     Name();
     if (lexem.content != "[") {
-        // throw
+        throw ExpectedSquareOpen();
     }
-    lexem = request_lexem();
+    GetLexem();
     Expression();
     if (lexem.content != "]") {
-        // throw
+        throw ExpectedSquareClose();
     }
-    lexem = request_lexem();
+    GetLexem();
 }
 
 void Literal() {
-    lexem = request_lexem();
+    GetLexem();
     if (lexem.content == "false" || lexem.content == "true") {
-        Boolean_Literal();
+        BooleanLiteral();
     } else
-        Arithmetic_Literal();
+        ArithmeticLiteral();
 }
