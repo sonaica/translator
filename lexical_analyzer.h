@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "SyntaxError.h"
 
 
 struct Vertex {
@@ -15,9 +16,8 @@ struct Lexem {
 
 struct Verdict {
     bool is_error = false;
-    int type = -1;
-    int line_number = -1;
     Lexem lexem;
+    int type = -1;
 };
 
 enum class States {

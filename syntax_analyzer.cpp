@@ -36,8 +36,13 @@ void GetLexem() {
     Verdict verdict = FSM();
     if (!verdict.is_error) {
         verdict.lexem;
+        return;
     }
-    throw verdict;
+    if (verdict.type == 1) {
+        throw ImpossibleLexem();
+    } else if (verdict.type == 2) {
+        throw InvalidSymbol();
+    }
 }
 
 // void OutputLexems(std::string file, std::vector<Lexem> &vec) {

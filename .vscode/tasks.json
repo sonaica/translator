@@ -7,9 +7,12 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "${file}",
+                "analyzer.cpp",
+                "lexical_analyzer.cpp",
+                "syntax_analyzer.cpp",
+                "SyntaxError.cpp",
                 "-o",
-                "${fileDirname}/${fileBasenameNoExtension}"
+                "analyzer"
             ],
             "options": {
                 "cwd": "${fileDirname}"

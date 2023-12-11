@@ -1,5 +1,5 @@
 #pragma once
-#include <SyntaxError.h>
+#include "SyntaxError.h"
 
 #include <deque>
 #include <string>

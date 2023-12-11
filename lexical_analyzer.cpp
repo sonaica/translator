@@ -88,7 +88,7 @@ Verdict FSM() {
         cur = text[pos];
         switch (state) {
             case States::H:
-                if (is_keyword(text, pos, current_lexem)) {
+                if (is_keyword(current_lexem)) {
                     if (current_lexem == "true" || current_lexem == "false") {
                         verdict_return.lexem = create_lexem(current_lexem, 3);
                         return verdict_return;
@@ -139,13 +139,11 @@ Verdict FSM() {
                     state = States::Literal_String;
                 } else if (is_alphabet(cur)) {
                     verdict_return.is_error = true;
-                    verdict_return.line_number = lines;
                     verdict_return.type = 1;
                     return verdict_return;
                 } else {
                     verdict_return.is_error = true;
                     verdict_return.type = 2;
-                    verdict_return.line_number = lines;
                     return verdict_return;
                 }
                 break;
@@ -177,7 +175,6 @@ Verdict FSM() {
                     state = States::Literal_Double;
                 } else if (is_letter(cur)) {
                     verdict_return.is_error = true;
-                    verdict_return.line_number = lines;
                     verdict_return.type = 1;
                     return verdict_return;
                 } else {
@@ -215,11 +212,3 @@ Verdict FSM() {
     }
     return verdict_return;
 }
-
-// void add_lexem(std::string &str, int type, std::vector<Lexem> &lexems) {
-//     Lexem lex;
-//     lex.content = str;
-//     lex.type = type;
-//     lexems.push_back(lex);
-//     str.clear();
-// }

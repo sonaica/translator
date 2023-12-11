@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <string>
 
@@ -175,4 +176,10 @@ class ExpectedEqual : public SyntaxError {
    public:
     ExpectedEqual();
     virtual ~ExpectedEqual();
+};
+
+class ImpossibleLexem : public SyntaxError {
+   public:
+    ImpossibleLexem();
+    virtual ~ImpossibleLexem();
 };

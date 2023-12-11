@@ -158,3 +158,8 @@ ExpectedComma::~ExpectedComma() = default;
 ExpectedEqual::ExpectedEqual() : SyntaxError("Error: expected \"=\""){};
 
 ExpectedEqual::~ExpectedEqual() = default;
+
+ImpossibleLexem::ImpossibleLexem()
+    : SyntaxError("Error: impossible to allocate a lexem"){};
+
+ImpossibleLexem::~ImpossibleLexem() = default;
