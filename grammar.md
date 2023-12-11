@@ -132,6 +132,8 @@
 ```
 <Input> ::= input <Variable> {, <Variable>}
 
+<OutputItem> ::= "<String>"|<Expression>
+
 <Output> ::= output <Expression> {, <Expression>}
 ```
 ### Arrays
