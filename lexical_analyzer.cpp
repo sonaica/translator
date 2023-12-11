@@ -44,24 +44,14 @@ bool is_digit(char c) {
     return false;
 }
 
-bool is_keyword(std::string &keyword) {
+bool is_keyword(std::string keyword) {
     auto v = root;
-    int ind = pos;
-    std::string str;
-    while (v != nullptr) {
-        if (v->terminal) {
-            keyword = str;
-        }
-        v = v->to[text[ind] - 'a'];
-        if (v != nullptr) str += text[ind];
-        ++ind;
+    for (int i = 0; i < keyword.length(); ++i) {
+        if (v == nullptr) return false;
+        v = v->to[keyword[i] - 'a'];
     }
-    if (str != keyword || str == "") {
-        keyword.clear();
-        return false;
-    }
-    pos = ind - 1;
-    return true;
+    if (v != nullptr && v->terminal) return true;
+    return false;
 }
 
 bool is_alphabet(char c) {
@@ -88,17 +78,8 @@ Verdict FSM() {
         cur = text[pos];
         switch (state) {
             case States::H:
-                if (is_keyword(current_lexem)) {
-                    if (current_lexem == "true" || current_lexem == "false") {
-                        verdict_return.lexem = create_lexem(current_lexem, 3);
-                        return verdict_return;
-                    } else {
-                        verdict_return.lexem = create_lexem(current_lexem, 1);
-                        return verdict_return;
-                    }
-                    continue;
-                } else if (cur == '/' && pos + 1 < text.size() &&
-                           text[pos + 1] == '/') {
+                if (cur == '/' && pos + 1 < text.size() &&
+                    text[pos + 1] == '/') {
                     pos += 2;
                     state = States::Comment;
                 } else if (is_letter(cur)) {
@@ -123,7 +104,7 @@ Verdict FSM() {
                     ++pos;
                     verdict_return.lexem = create_lexem(current_lexem, 7);
                     return verdict_return;
-                } else if (cur == '[' || cur == '}') {
+                } else if (cur == '[' || cur == ']') {
                     current_lexem += cur;
                     ++pos;
                     verdict_return.lexem = create_lexem(current_lexem, 7);
@@ -157,6 +138,18 @@ Verdict FSM() {
                     current_lexem += cur;
                     ++pos;
                 } else {
+                    if (is_keyword(current_lexem)) {
+                        if (current_lexem == "true" ||
+                            current_lexem == "false") {
+                            verdict_return.lexem =
+                                create_lexem(current_lexem, 3);
+                            return verdict_return;
+                        } else {
+                            verdict_return.lexem =
+                                create_lexem(current_lexem, 1);
+                            return verdict_return;
+                        }
+                    }
                     verdict_return.lexem = create_lexem(current_lexem, 2);
                     return verdict_return;
                 }

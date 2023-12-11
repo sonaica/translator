@@ -703,7 +703,6 @@ void ArrayDeclarationAuto() {
     if (lexem.content != ";") {
         throw MissingSemicolumn();
     }
-    GetLexem();
 }
 
 void ArrayDeclarationExact() {
@@ -730,7 +729,6 @@ void ArrayDeclarationExact() {
     if (lexem.content != ";") {
         throw MissingSemicolumn();
     }
-    GetLexem();
 }
 
 void ArrayIndexation() {
