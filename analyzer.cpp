@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "SyntaxError.h"
 #include "lexical_analyzer.h"
 #include "syntax_analyzer.h"
 
@@ -20,9 +21,13 @@ int main() {
     ReadFile(file_in, text);
 
     try {
-        lexem = request_lexem();
+        GetLexem();
         Program();
-    } catch (Verdict verdict) {
-        // different errors
+    } catch (SyntaxError& e) {
+        std::cout << "in line " << lines << ": ";
+        e.what();
+        return 1;
     }
+    std::cout << "OK";
+    return 0;
 }
