@@ -40,11 +40,15 @@
 
 <Type> ::= void | int | double | bool
 
-<Variable Creation> ::= <Type> <Name> [= <Expression>] {, <Name> [= <Expression>]}
+<Variable Creation One> ::= <Type> <Name> [= <Expression>]
 
-<Variable Definition> ::= <Type> <Name> {, <Name>};
+<Entity Creation> ::= <Variable Creation One> | <Array declaration>
 
-<Variable Initialization> ::= <Type> {<Name> = <Expression>, } <Name> = <Expression>;
+<Variable Creation> ::= <Entity Creation> {, <Entity Creation>};
+
+//<Variable Definition> ::= <Type> <Name> {, <Name>};
+
+//<Variable Initialization> ::= <Type> {<Name> = <Expression>, } <Name> = <Expression>;
 
 <Sign> ::= + | -
 
