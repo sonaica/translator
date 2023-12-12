@@ -62,7 +62,7 @@
 ```
 ### Arithmetic, logic, comparison and assignment
 ```
-<Arithmetic logic expression> ::= <Unary term>
+<Arithmetic logic expression> ::= <Assignment term>
 
 <Unary> ::= + | - | ++ | -- | ~
 
@@ -86,27 +86,27 @@
 
 <Assignment> ::= = | <<= | >>= | += | -= | *= | **= | /= | //= | ^= | &= | |= | %=
 
-<Unary term> ::= <Unary><Unary term> | <Power term>
+<Unary term> ::= <Unary><Unary term> | <Arithmetic term>
 
-<Power term> ::= <Mul term>{<Power><Mul term>}
+<Power term> ::= <Unary term>{<Power><Unary term>}
 
-<Mul term> ::= <Sum term>{<Mul><Sum term>}
+<Mul term> ::= <Power term>{<Mul><Power term>}
 
-<Sum term> ::= <Shift term>{<Sum><Shift term>}
+<Sum term> ::= <Mul term>{<Sum><Mul term>}
 
-<Shift term> ::= <NonEquality term>{<Shift><NonEquality term>}
+<Shift term> ::= <Sum term>{<Shift><Sum term>}
 
-<NonEquality term> ::= <Equality term>{<NonEquality><Equality term>}
+<NonEquality term> ::= <Shift term>{<NonEquality><Shift term>}
 
-<Equality term> ::= <And term>{<Equality><And term>}
+<Equality term> ::= <NonEquality term>{<Equality><NonEquality term>}
 
-<And term> ::= <Xor term>{<And><Xor term>}
+<And term> ::= <Equality term>{<And><Equality term>}
 
-<Xor term> ::= <Or term>{<Xor><Or term>}
+<Xor term> ::= <And term>{<Xor><And term>}
 
-<Or term> ::= <Assignment term>{<Or><Arithmetic term>}
+<Or term> ::= <Xor term>{<Or><Xor term>}
 
-<Assignment term> ::= <Arithmetic term>{<Assignment><Arithmetic term>}
+<Assignment term> ::= <Or term>{<Assignment><Or term>}
 
 <Arithmetic term> ::= <Boolean literal> | <Arithmetic literal> | <Variable> | "("<Arithmetic logic expression>")" | <Struct member> | <Function call>
 
