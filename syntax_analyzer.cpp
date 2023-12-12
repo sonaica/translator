@@ -309,7 +309,7 @@ void ExpressionTerm() { ArithmeticExpression(); }
 
 // Arithmetic, logic and comparison
 
-void ArithmeticExpression() { UnaryTerm(); }
+void ArithmeticExpression() { AssignmentTerm(); }
 
 bool Unary() {
     if (lexem.content == "+" || lexem.content == "-" || lexem.content == "++" ||
@@ -411,77 +411,77 @@ void UnaryTerm() {
     if (Unary()) {
         UnaryTerm();
     } else {
-        PowerTerm();
+        ArithmeticTerm();
     }
 }
 
 void PowerTerm() {
-    MulTerm();
+    UnaryTerm();
     while (Power()) {
-        MulTerm();
+        UnaryTerm();
     }
 }
-
+// dopilit
 void MulTerm() {
-    SumTerm();
+    PowerTerm();
     while (Mul()) {
-        SumTerm();
+        PowerTerm();
     }
 }
 
 void SumTerm() {
-    ShiftTerm();
+    MulTerm();
     while (Sum()) {
-        ShiftTerm();
+        MulTerm();
     }
 }
 
 void ShiftTerm() {
-    NonEqualityTerm();
+    SumTerm();
     while (Shift()) {
-        NonEqualityTerm();
+        SumTerm();
     }
 }
 
 void NonEqualityTerm() {
-    EqualityTerm();
+    ShiftTerm();
     while (NonEquality()) {
-        EqualityTerm();
+        ShiftTerm();
     }
 }
 
 void EqualityTerm() {
-    AndTerm();
+    NonEqualityTerm();
     while (Equality()) {
-        AndTerm();
+        NonEqualityTerm();
     }
 }
 
 void AndTerm() {
-    XorTerm();
+    EqualityTerm();
     while (And()) {
-        XorTerm();
+        EqualityTerm();
     }
 }
 
 void XorTerm() {
-    OrTerm();
+    AndTerm();
     while (Xor()) {
-        OrTerm();
+        AndTerm();
     }
 }
 
 void OrTerm() {
-    AssignmentTerm();
+    XorTerm();
     while (Or()) {
-        AssignmentTerm();
+        XorTerm();
     }
 }
 
 void AssignmentTerm() {
-    ArithmeticTerm();
+    OrTerm();
     while (Assignment()) {
-        ArithmeticTerm();
+        OrTerm();
     }
 }
 
