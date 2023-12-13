@@ -93,9 +93,7 @@ void Program() {
 void Directive() {
     if (lexem.content == "import") {
         GetLexem();
-        if (lexem.content.size() <= 2 || lexem.content[0] != '\"' ||
-            lexem.content.back() != '\"')
-            throw InvalidFilename();
+        if (lexem.type != string_literal_type) throw InvalidFilename();
         GetLexem();
         if (lexem.content != ";") throw MissingSemicolumn();
         GetLexem();
@@ -118,7 +116,7 @@ void FunctionDefinition() {
     GetLexem();
     Name();
     FunctionParameters();
-    Type();
+    if (!Type()) Name();
     if (lexem.content != "{") throw InvalidFunctionDefinition();
     GetLexem();
     while (lexem.content != "}") {
@@ -130,11 +128,15 @@ void FunctionDefinition() {
 void FunctionParameters() {
     if (lexem.content != "(") throw UndefinedFunctionParameters();
     GetLexem();
-    Type();
+    if (lexem.content == ")") {
+        GetLexem();
+        return;
+    }
+    if (!Type()) Name();
     Name();
     while (lexem.content == ",") {
         GetLexem();
-        Type();
+        if (!Type()) Name();
         Name();
     }
     if (lexem.content != ")") throw UndefinedFunctionParameters();
@@ -149,6 +151,10 @@ void FunctionCall() {
 void ArgumentList() {
     if (lexem.content != "(") throw InvalidArgumentList();
     GetLexem();
+    if (lexem.content == ")") {
+        GetLexem();
+        return;
+    }
     Expression();
     while (lexem.content == ",") {
         GetLexem();
@@ -176,6 +182,10 @@ void StructDefinition() {
     }
     if (lexem.content != "}") throw InvalidStructDefinition();
     GetLexem();
+    if (lexem.content == ";") {
+        GetLexem();
+        return;
+    }
     Name();
     while (lexem.content == ",") {
         GetLexem();
@@ -214,16 +224,15 @@ bool Letter(char c) {
 
 bool Digit(char c) { return ('0' <= c && c <= '9'); }
 
-bool SpecialSymbol(char c) {
-    return c == '_' || c == '/' || c == '\"' || c == ',' || c == ' ';
-}
+bool SpecialSymbol(char c) { return c == '_' || c == '/' || c == ','; }
 
 void Name() {
-    if (lexem.content.empty()) throw InvalidName();
-    if (Digit(lexem.content[0])) throw InvalidName();
-    for (int ind = 1; ind < lexem.content.size(); ++ind)
-        if (!Letter(lexem.content[ind]) && !Digit(lexem.content[ind]))
-            throw InvalidSymbol();
+    if (lexem.type != identifier_type) throw InvalidName();
+    // if (lexem.content.empty()) throw InvalidName();
+    // if (Digit(lexem.content[0])) throw InvalidName();
+    // for (int ind = 1; ind < lexem.content.size(); ++ind)
+    //     if (!Letter(lexem.content[ind]) && !Digit(lexem.content[ind]))
+    //         throw InvalidSymbol();
     GetLexem();
 }
 
@@ -518,7 +527,7 @@ void ArithmeticTerm() {
 }
 
 bool BooleanLiteral() {
-    if (lexem.content == "true" || lexem.content == "false") {
+    if (lexem.type == literal_bool_type) {
         GetLexem();
         return true;
     }
@@ -526,12 +535,17 @@ bool BooleanLiteral() {
 }
 
 bool ArithmeticLiteral() {
-    if (!SignedNumber()) return false;
-    if (lexem.content == ".") {
+    if (lexem.type == literal_int_type || lexem.type == literal_double_type) {
         GetLexem();
-        if (!UnsignedNumber()) throw InvalidArithmeticLiteral();
+        return true;
     }
-    return true;
+    return false;
+    // if (!SignedNumber()) return false;
+    // if (lexem.content == ".") {
+    //     GetLexem();
+    //     if (!UnsignedNumber()) throw InvalidArithmeticLiteral();
+    // }
+    // return true;
 }
 
 void Operator() {
@@ -666,10 +680,14 @@ void Output() {
 }
 
 void OutputItem() {
-    if (lexem.content[0] == '\"' && lexem.content.back() == '\"') {
-        String();
+    if (lexem.type == string_literal_type) {
+        GetLexem();
         return;
     }
+    // if (lexem.content[0] == '\"' && lexem.content.back() == '\"') {
+    //     String();
+    //     return;
+    // }
     if (lexem.content[0] == '\"') throw InvalidStringLiteral();
     Expression();
 }
@@ -685,6 +703,7 @@ void Match() {
         if (lexem.content != ">=") {
             throw ExpectedMatch();
         }
+        GetLexem();
         Operator();
     }
     GetLexem();
@@ -717,9 +736,6 @@ void ArrayDeclarationAuto() {
         throw ExpectedFigureClose();
     }
     GetLexem();
-    if (lexem.content != ";") {
-        throw MissingSemicolumn();
-    }
 }
 
 void ArrayDeclarationExact() {
@@ -742,9 +758,7 @@ void ArrayDeclarationExact() {
         if (lexem.content != "}") {
             throw ExpectedFigureClose();
         }
-    }
-    if (lexem.content != ";") {
-        throw MissingSemicolumn();
+        GetLexem();
     }
 }
 

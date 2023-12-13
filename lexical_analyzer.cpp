@@ -56,7 +56,8 @@ bool is_keyword(std::string keyword) {
 
 bool is_alphabet(char c) {
     if (is_digit(c) || is_letter(c) || is_operation(c) || c == '(' ||
-        c == ')' || c == '{' || c == '}' || c == ';' || c == ',' || c == '.')
+        c == ')' || c == '{' || c == '}' || c == ';' || c == ',' || c == '.' ||
+        c == '[' || c == ']')
         return true;
     return false;
 }
@@ -97,22 +98,22 @@ Verdict FSM() {
                 } else if (cur == ',') {
                     current_lexem += cur;
                     ++pos;
-                    verdict_return.lexem = create_lexem(current_lexem, 6);
+                    verdict_return.lexem = create_lexem(current_lexem, 9);
                     return verdict_return;
                 } else if (cur == '(' || cur == ')') {
                     current_lexem += cur;
                     ++pos;
-                    verdict_return.lexem = create_lexem(current_lexem, 7);
+                    verdict_return.lexem = create_lexem(current_lexem, 10);
                     return verdict_return;
                 } else if (cur == '[' || cur == ']') {
                     current_lexem += cur;
                     ++pos;
-                    verdict_return.lexem = create_lexem(current_lexem, 7);
+                    verdict_return.lexem = create_lexem(current_lexem, 11);
                     return verdict_return;
                 } else if (cur == '{' || cur == '}' || cur == ';') {
                     current_lexem += cur;
                     ++pos;
-                    verdict_return.lexem = create_lexem(current_lexem, 5);
+                    verdict_return.lexem = create_lexem(current_lexem, 8);
                     return verdict_return;
                 } else if (cur == '\n') {
                     ++lines;
@@ -123,7 +124,7 @@ Verdict FSM() {
                     current_lexem += cur;
                     ++pos;
                     state = States::Literal_String;
-                } else if (is_alphabet(cur)) {
+                } else if (!is_alphabet(cur)) {
                     verdict_return.is_error = true;
                     verdict_return.type = 1;
                     return verdict_return;
@@ -142,15 +143,15 @@ Verdict FSM() {
                         if (current_lexem == "true" ||
                             current_lexem == "false") {
                             verdict_return.lexem =
-                                create_lexem(current_lexem, 3);
+                                create_lexem(current_lexem, literal_bool_type);
                             return verdict_return;
                         } else {
                             verdict_return.lexem =
-                                create_lexem(current_lexem, 1);
+                                create_lexem(current_lexem, keyword_type);
                             return verdict_return;
                         }
                     }
-                    verdict_return.lexem = create_lexem(current_lexem, 2);
+                    verdict_return.lexem = create_lexem(current_lexem, identifier_type);
                     return verdict_return;
                 }
                 break;
@@ -159,7 +160,7 @@ Verdict FSM() {
                     current_lexem += cur;
                     ++pos;
                 } else {
-                    verdict_return.lexem = create_lexem(current_lexem, 4);
+                    verdict_return.lexem = create_lexem(current_lexem, operation_type);
                     return verdict_return;
                 }
                 break;
@@ -176,7 +177,7 @@ Verdict FSM() {
                     verdict_return.type = 1;
                     return verdict_return;
                 } else {
-                    verdict_return.lexem = create_lexem(current_lexem, 3);
+                    verdict_return.lexem = create_lexem(current_lexem, literal_int_type);
                     return verdict_return;
                 }
                 break;
@@ -185,7 +186,7 @@ Verdict FSM() {
                     current_lexem += cur;
                     ++pos;
                 } else {
-                    verdict_return.lexem = create_lexem(current_lexem, 3);
+                    verdict_return.lexem = create_lexem(current_lexem, literal_double_type);
                     return verdict_return;
                 }
                 break;
@@ -202,7 +203,7 @@ Verdict FSM() {
                 } else {
                     current_lexem += cur;
                     ++pos;
-                    verdict_return.lexem = create_lexem(current_lexem, 3);
+                    verdict_return.lexem = create_lexem(current_lexem, string_literal_type);
                     return verdict_return;
                 }
                 break;

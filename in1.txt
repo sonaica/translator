@@ -18,7 +18,7 @@ struct my_struct{
     fun sum(int a, int b) int {
         return a + b;
     }
-} str,jui;
+} str, jui;
 
 main() {
     input n;
@@ -26,8 +26,8 @@ main() {
         input p[i];
         
     int value = -1000000000;
-    for (int i = 0; i < n; ++i) {
-        value = max(value, p[i])=9;
+    for (int i = 0; i < n; i++) {
+        value = max(value, p[i])=9.0;
     }
     output value;
 }

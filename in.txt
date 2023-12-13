@@ -1,7 +1,7 @@
 import "math.h";
 define for fon;
 
-struct cool_struct {} bob;
+struct cool_struct {};
 
 main() {
     int a[5];

@@ -168,3 +168,8 @@ InvalidStringLiteral::InvalidStringLiteral()
     : SyntaxError("Error: invalid string literal"){};
 
 InvalidStringLiteral::~InvalidStringLiteral() = default;
+
+// InvalidInitialization::InvalidInitialization()
+//     : SyntaxError("Error: invalid initialization"){};
+
+// InvalidInitialization::~InvalidInitialization() = default;

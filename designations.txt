@@ -1,7 +1,11 @@
 1 - keyword
-2 - identifier
-3 - literal
-4 - operation
-5 - ; and {}
-6 - ,
-7 - ()
+2 - identifier (= name)
+3 - literal int 
+4 - literal double
+5 - literal bool
+6 - string literal
+7 - operation
+8 - ; and {}
+9 - ,
+10 - ()
+11 - []

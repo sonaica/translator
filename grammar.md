@@ -8,9 +8,9 @@
 ```
 ### Functions
 ```
-<Function definition> ::= fun <Name> <Function parameters> <Type>  ‘{‘ <Operator> return <Expression>‘}’
+<Function definition> ::= fun <Name> <Function parameters> (<Type>|<Name>)  ‘{‘ <Operator> return <Expression>‘}’
 
-<Function parameters> ::= "(" <Type> <Name> {, <Type> <Name> } ")"
+<Function parameters> ::= "(" (<Name>|<Type>) <Name> {, (<Name>|<Type>) <Name> } ")"
 
 <Function call> ::= <Name><Argument list>
 
@@ -132,7 +132,9 @@
 ```
 <Input> ::= input <Variable> {, <Variable>}
 
-<Output> ::= output <Expression> {, <Expression>}
+<Output> ::= output <Output Item> {, <Output Item>}
+
+<OutputItem> ::= "<String>"|<Expression>
 ```
 ### Arrays
 ```
