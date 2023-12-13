@@ -497,7 +497,7 @@ void AssignmentTerm() {
 void ArithmeticTerm() {
     if (lexem.content == "(") {
         GetLexem();
-        ArithmeticExpression();
+        Expression();
         if (lexem.content != ")") throw InvalidArithmeticTerm();
         GetLexem();
         return;

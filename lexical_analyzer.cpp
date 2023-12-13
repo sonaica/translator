@@ -10,6 +10,8 @@ Vertex *root = new Vertex();
 extern std::vector<char> text;
 extern int pos;
 extern int lines;
+extern bool new_line;
+extern bool new_line_prev;
 
 void CreateBor(std::string file_keywords) {
     std::string str;
@@ -69,6 +71,11 @@ Lexem create_lexem(std::string str, int type) {
     return lex;
 }
 
+void update_line(bool f) {
+    std::swap(new_line, new_line_prev);
+    new_line = f;
+}
+
 Verdict FSM() {
     Lexem lex;
     States state = States::H;
@@ -79,6 +86,7 @@ Verdict FSM() {
         cur = text[pos];
         switch (state) {
             case States::H:
+                if (cur != ' ') update_line(false);
                 if (cur == '/' && pos + 1 < text.size() &&
                     text[pos + 1] == '/') {
                     pos += 2;
@@ -118,6 +126,7 @@ Verdict FSM() {
                 } else if (cur == '\n') {
                     ++lines;
                     ++pos;
+                    update_line(true);
                 } else if (cur == ' ')
                     ++pos;
                 else if (cur == '\"') {
@@ -151,7 +160,8 @@ Verdict FSM() {
                             return verdict_return;
                         }
                     }
-                    verdict_return.lexem = create_lexem(current_lexem, identifier_type);
+                    verdict_return.lexem =
+                        create_lexem(current_lexem, identifier_type);
                     return verdict_return;
                 }
                 break;
@@ -160,7 +170,8 @@ Verdict FSM() {
                     current_lexem += cur;
                     ++pos;
                 } else {
-                    verdict_return.lexem = create_lexem(current_lexem, operation_type);
+                    verdict_return.lexem =
+                        create_lexem(current_lexem, operation_type);
                     return verdict_return;
                 }
                 break;
@@ -177,7 +188,8 @@ Verdict FSM() {
                     verdict_return.type = 1;
                     return verdict_return;
                 } else {
-                    verdict_return.lexem = create_lexem(current_lexem, literal_int_type);
+                    verdict_return.lexem =
+                        create_lexem(current_lexem, literal_int_type);
                     return verdict_return;
                 }
                 break;
@@ -186,7 +198,8 @@ Verdict FSM() {
                     current_lexem += cur;
                     ++pos;
                 } else {
-                    verdict_return.lexem = create_lexem(current_lexem, literal_double_type);
+                    verdict_return.lexem =
+                        create_lexem(current_lexem, literal_double_type);
                     return verdict_return;
                 }
                 break;
@@ -203,7 +216,8 @@ Verdict FSM() {
                 } else {
                     current_lexem += cur;
                     ++pos;
-                    verdict_return.lexem = create_lexem(current_lexem, string_literal_type);
+                    verdict_return.lexem =
+                        create_lexem(current_lexem, string_literal_type);
                     return verdict_return;
                 }
                 break;

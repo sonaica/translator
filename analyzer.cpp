@@ -12,6 +12,7 @@ int pos = 0;
 int lines = 1;
 std::vector<char> text;
 Lexem lexem;
+bool new_line, new_line_prev;
 
 int main() {
     // std::cout << "Enter the name of file: ";
@@ -24,7 +25,7 @@ int main() {
         GetLexem();
         Program();
     } catch (SyntaxError& e) {
-        if (lexem.content == "}") --lines;
+        if (new_line_prev) --lines;
         std::cout << "in line " << lines << ": ";
         e.what();
         return 1;

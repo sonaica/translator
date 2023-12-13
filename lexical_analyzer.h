@@ -46,3 +46,5 @@ bool is_keyword(std::vector<char> &text, int &i, std::string &keyword);
 bool is_alphabet(char c);
 Lexem create_lexem(std::string str, int type);
 Verdict FSM();
+
+void update_line(bool f);
