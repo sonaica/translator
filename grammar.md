@@ -14,7 +14,7 @@
 
 <Function call> ::= <Name><Argument list>
 
-<Argument list> ::= "("<Name> {, <Name> }")"
+<Argument list> ::= "("<Expression> {, <Expression> }")"
 ```
 ### Structures
 ```
