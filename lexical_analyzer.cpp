@@ -30,7 +30,7 @@ void CreateBor(std::string file_keywords) {
 bool is_operation(char c) {
     if (c == '=' || c == '+' || c == '-' || c == '~' || c == '&' || c == '|' ||
         c == '*' || c == '>' || c == '<' || c == '/' || c == '^' || c == '%' ||
-        c == '.')
+        c == '.' || c == '!')
         return true;
     return false;
 }
@@ -77,6 +77,7 @@ void update_line(bool f) {
 }
 
 Verdict FSM() {
+    bool point = false;
     Lexem lex;
     States state = States::H;
     char cur;
@@ -86,6 +87,7 @@ Verdict FSM() {
         cur = text[pos];
         switch (state) {
             case States::H:
+                point = false;
                 if (cur != ' ') update_line(false);
                 if (cur == '/' && pos + 1 < text.size() &&
                     text[pos + 1] == '/') {
@@ -147,12 +149,27 @@ Verdict FSM() {
                 if (is_letter(cur) || is_digit(cur)) {
                     current_lexem += cur;
                     ++pos;
+                } else if (cur == '.') {
+                    if (!point) {
+                        current_lexem += cur;
+                        ++pos;
+                        point = true;
+                    } else {
+                        verdict_return.is_error = true;
+                        verdict_return.type = 3;
+                        return verdict_return;
+                    }
                 } else {
                     if (is_keyword(current_lexem)) {
                         if (current_lexem == "true" ||
                             current_lexem == "false") {
                             verdict_return.lexem =
                                 create_lexem(current_lexem, literal_bool_type);
+                            return verdict_return;
+                        } else if (current_lexem == "and" ||
+                                   current_lexem == "or") {
+                            verdict_return.lexem =
+                                create_lexem(current_lexem, operation_type);
                             return verdict_return;
                         } else {
                             verdict_return.lexem =

@@ -41,6 +41,8 @@ void GetLexem() {
         throw ImpossibleLexem();
     } else if (verdict.type == 2) {
         throw InvalidSymbol();
+    } else if (verdict.type == 3) {
+        throw InvalidStructMember();
     }
 }
 

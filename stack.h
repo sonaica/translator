@@ -1,0 +1,22 @@
+#pragma once
+#include <stack>
+#include <string>
+
+#include "lexical_analyzer.h"
+
+std::stack<std::string>st;
+
+std::string check_id(std::string name);  // its must be in the TID's functions
+//it returns the type of identificator
+void push_typeop(std::string lex);
+bool check_bin();
+bool check_uno();
+bool eq_bool();
+void stack_clear();
+
+bool is_unary(std::string op);
+bool is_assignment(std::string op);
+bool is_comparison(std::string op);
+bool is_binary(std::string op);
+bool is_type(std::string op);
+

@@ -195,3 +195,9 @@ class InvalidStringLiteral : public SyntaxError {
 //     InvalidInitialization();
 //     virtual ~InvalidInitialization();
 // };
+
+class InvalidTypes : public SyntaxError {
+   public:
+    InvalidTypes();
+    virtual ~InvalidTypes();
+};

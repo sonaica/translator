@@ -19,3 +19,5 @@ output
 do
 match
 return
+and
+or

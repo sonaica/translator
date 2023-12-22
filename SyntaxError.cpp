@@ -173,3 +173,8 @@ InvalidStringLiteral::~InvalidStringLiteral() = default;
 //     : SyntaxError("Error: invalid initialization"){};
 
 // InvalidInitialization::~InvalidInitialization() = default;
+
+InvalidTypes::InvalidTypes()
+    : SyntaxError("Error: invalid types in the expression"){};
+
+InvalidTypes::~InvalidTypes() = default;
