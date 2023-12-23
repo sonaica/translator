@@ -7,6 +7,7 @@
 
 #include "SyntaxError.h"
 #include "lexical_analyzer.h"
+#include "stack.h"
 extern std::vector<char> text;
 extern int pos;
 extern Lexem lexem;
@@ -158,9 +159,11 @@ void ArgumentList() {
         return;
     }
     Expression();
+    stack_clear();
     while (lexem.content == ",") {
         GetLexem();
         Expression();
+        stack_clear();
     }
     if (lexem.content != ")") throw InvalidArgumentList();
     GetLexem();
@@ -243,6 +246,7 @@ void Variable() {
     if (lexem.content == "[") {
         GetLexem();
         Expression();
+        stack_clear();
         if (lexem.content != "]") throw InvalidArrayIndexation();
         GetLexem();
     }
@@ -268,6 +272,7 @@ void EntityCreation() {
     if (lexem.content == "=") {
         GetLexem();
         Expression();
+        stack_clear();
         return;
     }
 }
@@ -325,6 +330,7 @@ void ArithmeticExpression() { AssignmentTerm(); }
 bool Unary() {
     if (lexem.content == "+" || lexem.content == "-" || lexem.content == "++" ||
         lexem.content == "--" || lexem.content == "~") {
+        push_typeop(lexem.content);
         GetLexem();
         return true;
     }
@@ -333,6 +339,7 @@ bool Unary() {
 
 bool Mul() {
     if (lexem.content == "*" || lexem.content == "/" || lexem.content == "%") {
+        push_typeop(lexem.content);
         GetLexem();
         return true;
     }
@@ -341,6 +348,7 @@ bool Mul() {
 
 bool Sum() {
     if (lexem.content == "+" || lexem.content == "-") {
+        push_typeop(lexem.content);
         GetLexem();
         return true;
     }
@@ -349,6 +357,7 @@ bool Sum() {
 
 bool Power() {
     if (lexem.content == "**") {
+        push_typeop(lexem.content);
         GetLexem();
         return true;
     }
@@ -357,6 +366,7 @@ bool Power() {
 
 bool And() {
     if (lexem.content == "&" || lexem.content == "and") {
+        push_typeop(lexem.content);
         GetLexem();
         return true;
     }
@@ -365,6 +375,7 @@ bool And() {
 
 bool Xor() {
     if (lexem.content == "^") {
+        push_typeop(lexem.content);
         GetLexem();
         return true;
     }
@@ -373,6 +384,7 @@ bool Xor() {
 
 bool Or() {
     if (lexem.content == "|" || lexem.content == "or") {
+        push_typeop(lexem.content);
         GetLexem();
         return true;
     }
@@ -381,6 +393,7 @@ bool Or() {
 
 bool Shift() {
     if (lexem.content == "<<" || lexem.content == ">>") {
+        push_typeop(lexem.content);
         GetLexem();
         return true;
     }
@@ -389,6 +402,7 @@ bool Shift() {
 
 bool Equality() {
     if (lexem.content == "==" || lexem.content == "!=") {
+        push_typeop(lexem.content);
         GetLexem();
         return true;
     }
@@ -398,6 +412,7 @@ bool Equality() {
 bool NonEquality() {
     if (lexem.content == "<" || lexem.content == ">" || lexem.content == "<=" ||
         lexem.content == ">=") {
+        push_typeop(lexem.content);
         GetLexem();
         return true;
     }
@@ -412,6 +427,7 @@ bool Assignment() {
         lexem.content == "//=" || lexem.content == "^=" ||
         lexem.content == "&=" || lexem.content == "|=" ||
         lexem.content == "%=") {
+        push_typeop(lexem.content);
         GetLexem();
         return true;
     }
@@ -421,6 +437,7 @@ bool Assignment() {
 void UnaryTerm() {
     if (Unary()) {
         UnaryTerm();
+        check_uno();
     } else {
         ArithmeticTerm();
     }
@@ -430,6 +447,7 @@ void PowerTerm() {
     UnaryTerm();
     while (Power()) {
         UnaryTerm();
+        check_bin();
     }
 }
 // dopilit
@@ -437,6 +455,7 @@ void MulTerm() {
     PowerTerm();
     while (Mul()) {
         PowerTerm();
+        check_bin();
     }
 }
 
@@ -444,6 +463,7 @@ void SumTerm() {
     MulTerm();
     while (Sum()) {
         MulTerm();
+        check_bin();
     }
 }
 
@@ -451,6 +471,7 @@ void ShiftTerm() {
     SumTerm();
     while (Shift()) {
         SumTerm();
+        check_bin();
     }
 }
 
@@ -458,6 +479,7 @@ void NonEqualityTerm() {
     ShiftTerm();
     while (NonEquality()) {
         ShiftTerm();
+        check_bin();
     }
 }
 
@@ -465,6 +487,7 @@ void EqualityTerm() {
     NonEqualityTerm();
     while (Equality()) {
         NonEqualityTerm();
+        check_bin();
     }
 }
 
@@ -472,6 +495,7 @@ void AndTerm() {
     EqualityTerm();
     while (And()) {
         EqualityTerm();
+        check_bin();
     }
 }
 
@@ -479,6 +503,7 @@ void XorTerm() {
     AndTerm();
     while (Xor()) {
         AndTerm();
+        check_bin();
     }
 }
 
@@ -486,6 +511,7 @@ void OrTerm() {
     XorTerm();
     while (Or()) {
         XorTerm();
+        check_bin();
     }
 }
 
@@ -493,6 +519,7 @@ void AssignmentTerm() {
     OrTerm();
     while (Assignment()) {
         OrTerm();
+        check_bin();
     }
 }
 
@@ -530,6 +557,7 @@ void ArithmeticTerm() {
 
 bool BooleanLiteral() {
     if (lexem.type == literal_bool_type) {
+        push_typeop("bool");
         GetLexem();
         return true;
     }
@@ -538,6 +566,10 @@ bool BooleanLiteral() {
 
 bool ArithmeticLiteral() {
     if (lexem.type == literal_int_type || lexem.type == literal_double_type) {
+        if (lexem.type == literal_double_type)
+            push_typeop("double");
+        else
+            push_typeop("int");
         GetLexem();
         return true;
     }
@@ -614,6 +646,8 @@ void If() {
     }
     GetLexem();
     Expression();
+    eq_bool();
+    stack_clear();
     if (lexem.content != ")") {
         throw ExpectedCloseParenthesis();
     }
@@ -632,11 +666,14 @@ void For() {
     GetLexem();
     VariableCreation();
     Expression();
+    stack_clear();
     if (lexem.content != ";") {
         throw MissingSemicolumn();
     }
     GetLexem();
     Expression();
+    eq_bool();
+    stack_clear();
     if (lexem.content != ")") {
         throw ExpectedCloseParenthesis();
     }
@@ -650,6 +687,8 @@ void While() {
     }
     GetLexem();
     Expression();
+    eq_bool();
+    stack_clear();
     if (lexem.content != ")") {
         throw ExpectedCloseParenthesis();
     }
@@ -702,6 +741,7 @@ void Match() {
     GetLexem();
     while (lexem.content != "}") {
         Expression();
+        stack_clear();
         if (lexem.content != ">=") {
             throw ExpectedMatch();
         }
@@ -742,6 +782,7 @@ void ArrayDeclarationAuto() {
 
 void ArrayDeclarationExact() {
     Expression();
+    stack_clear();
     if (lexem.content != "]") {
         throw ExpectedSquareClose();
     }
@@ -771,6 +812,7 @@ void ArrayIndexation() {
     }
     GetLexem();
     Expression();
+    stack_clear();
     if (lexem.content != "]") {
         throw ExpectedSquareClose();
     }
