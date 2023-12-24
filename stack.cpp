@@ -45,7 +45,7 @@ void push_typeop(std::string lex) {
     return;
 }
 
-bool check_bin() {
+void check_bin() {
     std::string a = st.top();
     st.pop();
     std::string op = st.top();
@@ -56,7 +56,7 @@ bool check_bin() {
     if (is_assignment(op)) {
         swap(a, b);
         st.push(a);
-        return true;
+        return;
     }
     if (is_binary(op)) {
         if (a == b)
@@ -67,22 +67,22 @@ bool check_bin() {
             st.push("int");
         else if (a == "double" && b == "bool" || a == "bool" && b == "double")
             st.push("double");
-        return true;
+        return;
     }
     if (is_logical(op)) {
         if (a == "double" || b == "double") throw InvalidTypes();
         st.push("int");
-        return true;
+        return;
     }
     if (is_comparison(op)) {
         st.push("bool");
-        return true;
+        return;
     }
     throw InvalidTypes();
     return;
 }
 
-bool check_uno() {
+void check_uno() {
     std::string a = st.top();
     st.pop();
     std::string op = st.top();
@@ -93,24 +93,29 @@ bool check_uno() {
     }
     if (is_unary(op) && a == "int") {
         st.push("int");
-        return true;
+        return;
     }
     if (is_unary(op) && op != "~" && a == "double") {
         st.push("double");
-        return true;
+        return;
     }
     if (is_unary(op) && op != "++" && op != "--" && a == "bool") {
         st.push("bool");
-        return true;
+        return;
     }
     throw InvalidTypes();
 }
 
-bool eq_bool() {
+void eq_bool() {
     std::string a = st.top();
     st.pop();
-    if (a == "bool") return true;
-    return false;
+    if (a != "bool") throw InvalidTypes();
+}
+
+void eq_int() {
+    std::string a = st.top();
+    st.pop();
+    if (a != "int") throw InvalidTypes();
 }
 
 void stack_clear() {

@@ -246,7 +246,6 @@ void Variable() {
     if (lexem.content == "[") {
         GetLexem();
         Expression();
-        stack_clear();
         if (lexem.content != "]") throw InvalidArrayIndexation();
         GetLexem();
     }
@@ -272,7 +271,6 @@ void EntityCreation() {
     if (lexem.content == "=") {
         GetLexem();
         Expression();
-        stack_clear();
         return;
     }
 }
@@ -532,22 +530,20 @@ void ArithmeticTerm() {
         return;
     }
     if (!BooleanLiteral() && !ArithmeticLiteral()) {
-        Name();
+        if (lexem.type == identifier_type) {
+            std::string type = check_id(lexem.content);
+            push_typeop(type);
+            GetLexem();
+        } else
+            throw InvalidName();
         if (lexem.content == "(") {
             ArgumentList();
-            return;
-        }
-        if (lexem.content == ".") {
-            GetLexem();
-            Name();
-            if (lexem.content == "(") {
-                ArgumentList();
-            }
             return;
         }
         if (lexem.content == "[") {
             GetLexem();
             Expression();
+            eq_int();
             if (lexem.content != "]") throw InvalidArrayIndexation();
             GetLexem();
             return;
@@ -633,6 +629,7 @@ void Operator() {
             return;
         }
         Expression();
+        stack_clear();
         if (lexem.content != ";") {
             throw MissingSemicolumn();
         }
