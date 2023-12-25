@@ -1,10 +1,11 @@
 #include "StringSet.h"
+#include <cstring>
 
 
 template<class T>
 StringSet<T>::Vertex::Vertex(T value)
 {
-    memset(move_to, -1, sizeof(move_to));
+    std::memset(move_to, -1, sizeof(move_to));
     terminal = true;
     extra_value = value;
 }

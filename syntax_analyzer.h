@@ -1,11 +1,25 @@
 #pragma once
-#include "SyntaxError.h"
 
 #include <deque>
 #include <string>
 #include <vector>
 
 #include "lexical_analyzer.h"
+#include "CompileError.h"
+#include "tids.h"
+// TIDS
+
+IdentifierTIDS IdTIDS;
+FunctionTIDS FunTIDS;
+StructTIDS StrTIDS;
+
+std::string function_in_creation;
+std::string struct_in_creation;
+std::string current_type;
+Value variable_in_creation;
+
+const std::string NOT_A_TYPE = "";
+const std::string NOT_A_STRUCT = "";
 
 void ReadFile(std::string file, std::vector<char>& text);
 
@@ -22,10 +36,10 @@ void Directive();
 
 // Functions
 
-void FunctionDefinition(std::string str);
-void FunctionParameters(std::string str);
-void FunctionCall(std::string str);
-void ArgumentList(std::string str);
+void FunctionDefinition(std::string str = NOT_A_STRUCT);
+void FunctionParameters(std::string str = NOT_A_STRUCT);
+void FunctionCall(std::string str = NOT_A_STRUCT);
+void ArgumentList(std::string str = NOT_A_STRUCT);
 
 // Structures
 
@@ -42,8 +56,8 @@ bool Letter(char c);
 bool SpecialSymbol(char c);
 bool Digit(char c);
 std::string Type();
-void EntityCreation(std::string str);
-void VariableCreation(std::string str);
+void EntityCreation(std::string str = NOT_A_STRUCT);
+void VariableCreation(std::string str = NOT_A_STRUCT);
 
 // void VariableDefinition();
 //
@@ -117,3 +131,7 @@ void Literal();
 // Match
 
 void Match();
+
+void reset_variable_in_creation();
+void reset_function_in_creation();
+void reset_struct_in_creation();

@@ -10,7 +10,10 @@
                 "analyzer.cpp",
                 "lexical_analyzer.cpp",
                 "syntax_analyzer.cpp",
-                "SyntaxError.cpp",
+                "CompileError.cpp",
+                "stack.cpp",
+                "tids.cpp",
+                "StringSet.cpp",
                 "-o",
                 "analyzer"
             ],

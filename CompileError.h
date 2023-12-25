@@ -201,67 +201,75 @@ class InvalidStringLiteral : public CompileError {
 // ----------------------- SEMANTIC ERRORS -----------------------
 
 class IdentifierAlreadyDefined : public CompileError {
-public:
+   public:
     IdentifierAlreadyDefined(const std::string& VariableName);
-    
+
     virtual ~IdentifierAlreadyDefined();
 };
 
 class UndefinedVariable : public CompileError {
-public:
+   public:
     UndefinedVariable(const std::string& VariableName);
 
     virtual ~UndefinedVariable();
 };
 
 class FunctionAlreadyDefined : public CompileError {
-public:
-    
+   public:
     FunctionAlreadyDefined(const std::string& FunctionName);
 
     virtual ~FunctionAlreadyDefined();
 };
 
 class UndefinedFunction : public CompileError {
-public:
-
+   public:
     UndefinedFunction(const std::string& FunctionName);
 
     virtual ~UndefinedFunction();
 };
 
 class InvalidParameter : public CompileError {
-public:
-    
-    InvalidParameter(const std::string& FunctionName, const std::string& ExpectedType, const std::string& GivenType);
+   public:
+    InvalidParameter(const std::string& FunctionName,
+                     const std::string& ExpectedType,
+                     const std::string& GivenType);
 
     virtual ~InvalidParameter();
 };
 
 class StructAlreadyDefined : public CompileError {
-public:
+   public:
     StructAlreadyDefined(const std::string& struct_name);
 
     virtual ~StructAlreadyDefined();
 };
 
 class UndefinedStruct : public CompileError {
-public:
+   public:
     UndefinedStruct(const std::string& struct_name);
 
     virtual ~UndefinedStruct();
 };
 
 class TooManyParameters : public CompileError {
-public:
-    TooManyParameters(const std::string& func_name, const int& expected_num_of_paramss);
+   public:
+    TooManyParameters(const std::string& func_name,
+                      const int& expected_num_of_paramss);
 
     virtual ~TooManyParameters();
 };
 
 class TooFewParameters : public CompileError {
-public:
-    TooFewParameters(const std::string& func_name, const int& expected_num_of_params, const int& given_num_of_params);
+   public:
+    TooFewParameters(const std::string& func_name,
+                     const int& expected_num_of_params,
+                     const int& given_num_of_params);
 
     virtual ~TooFewParameters();
+};
+
+class InvalidTypes : public CompileError{
+   public:
+    InvalidTypes();
+    virtual ~InvalidTypes();
 };

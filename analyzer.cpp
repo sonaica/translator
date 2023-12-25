@@ -2,9 +2,9 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include "CompileError.h"
 #include <vector>
 
-#include "SyntaxError.h"
 #include "lexical_analyzer.h"
 #include "syntax_analyzer.h"
 
@@ -24,7 +24,7 @@ int main() {
     try {
         GetLexem();
         Program();
-    } catch (SyntaxError& e) {
+    } catch (CompileError& e) {
         if (new_line_prev) --lines;
         std::cout << "in line " << lines << ": ";
         e.what();

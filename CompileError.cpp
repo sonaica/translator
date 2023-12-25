@@ -63,7 +63,8 @@ InvalidStructMember::~InvalidStructMember() = default;
 
 // Invalid Symbol
 
-InvalidSymbol::InvalidSymbol() : CompileError("Error: invalid symbol is used") {}
+InvalidSymbol::InvalidSymbol()
+    : CompileError("Error: invalid symbol is used") {}
 
 InvalidSymbol::~InvalidSymbol() = default;
 
@@ -176,58 +177,73 @@ InvalidStringLiteral::~InvalidStringLiteral() = default;
 
 // ----------------------- SEMANTIC ERRORS -----------------------
 
-IdentifierAlreadyDefined::IdentifierAlreadyDefined(const std::string& VariableName)
-    : CompileError("Error: variable with name (" + VariableName + ") was defined more than once")
-{}
+IdentifierAlreadyDefined::IdentifierAlreadyDefined(
+    const std::string& VariableName)
+    : CompileError("Error: variable with name (" + VariableName +
+                   ") was defined more than once") {}
 
 IdentifierAlreadyDefined::~IdentifierAlreadyDefined() = default;
 
 UndefinedVariable::UndefinedVariable(const std::string& VariableName)
-    : CompileError("Error: variable with name (" + VariableName + ") is undefined")
-{}
+    : CompileError("Error: variable with name (" + VariableName +
+                   ") is undefined") {}
 
 UndefinedVariable::~UndefinedVariable() = default;
 
 FunctionAlreadyDefined::FunctionAlreadyDefined(const std::string& FunctionName)
-    : CompileError("Error: function with name (" + FunctionName + ") was defined more than once")
-{}
+    : CompileError("Error: function with name (" + FunctionName +
+                   ") was defined more than once") {}
 
 FunctionAlreadyDefined::~FunctionAlreadyDefined() {}
 
 UndefinedFunction::UndefinedFunction(const std::string& FunctionName)
-    : CompileError("Error: function with name (" + FunctionName + ") is undefined")
-{}
+    : CompileError("Error: function with name (" + FunctionName +
+                   ") is undefined") {}
 
 UndefinedFunction::~UndefinedFunction() = default;
 
-InvalidParameter::InvalidParameter(const std::string& FunctionName, const std::string& ExpectedType, const std::string& GivenType)
-    : InvalidParameter("Error: invalid parameter entered in function (" FunctionName "). Expected (" + ExpectedType + "), given (" + GivenType + ")")
-{}
+InvalidParameter::InvalidParameter(const std::string& FunctionName,
+                                   const std::string& ExpectedType,
+                                   const std::string& GivenType)
+    : CompileError("Error: invalid parameter entered in function (" +
+                   FunctionName + "). Expected (" + ExpectedType +
+                   "), given (" + GivenType + ")") {}
 
 InvalidParameter::~InvalidParameter() = default;
 
 StructAlreadyDefined::StructAlreadyDefined(const std::string& struct_name)
-    : CompileError("Error: struct with name (" + struct_name + ") was defined more than once")
-{}
+    : CompileError("Error: struct with name (" + struct_name +
+                   ") was defined more than once") {}
 
 StructAlreadyDefined::~StructAlreadyDefined() = default;
 
 UndefinedStruct::UndefinedStruct(const std::string& struct_name)
-    : UndefinedStruct("Error: struct with name (" + struct_name + ") is undefined")
-{}
+    : CompileError("Error: struct with name (" + struct_name +
+                   ") is undefined") {}
 
 UndefinedStruct::~UndefinedStruct() = default;
 
-TooManyParameters::TooManyParameters(const std::string& func_name, const int& expected_num_of_params)
-    : CompileError("Error: function (" + func_name + ") expects " + to_string(expected_num_of_params) + " number of parameters, but more were given")
-{}
+TooManyParameters::TooManyParameters(const std::string& func_name,
+                                     const int& expected_num_of_params)
+    : CompileError("Error: function (" + func_name + ") expects " +
+                   std::to_string(expected_num_of_params) +
+                   " number of parameters, but more were given") {};
 
 TooManyParameters::~TooManyParameters() = default;
 
-TooFewParameters::TooFewParameters(const std::string& func_name, const int& expected_num_of_params, const int& given_num_of_params)
-    : CompileError("Error: function with name (" + func_name + ") expected " + to_string(expected_num_of_params) +
-        "parameters, but " + ((given_num_of_params == 0) ? "none were given" : ((given_num_of_params == 1) ? "only 1 was given" : "only " +
-            std::to_string(given_num_of_params) + " were given")))
-{}
+TooFewParameters::TooFewParameters(const std::string& func_name,
+                                   const int& expected_num_of_params,
+                                   const int& given_num_of_params)
+    : CompileError("Error: function with name (" + func_name + ") expected " +
+                   std::to_string(expected_num_of_params) + "parameters, but " +
+                   ((given_num_of_params == 0)
+                        ? "none were given"
+                        : ((given_num_of_params == 1)
+                               ? "only 1 was given"
+                               : "only " + std::to_string(given_num_of_params) +
+                                     " were given"))) {};
 
 TooFewParameters::~TooFewParameters() = default;
+
+InvalidTypes::InvalidTypes() : CompileError("Error: invalid types"){};
+InvalidTypes::~InvalidTypes() = default;

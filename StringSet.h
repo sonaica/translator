@@ -7,7 +7,7 @@ class StringSet {
     
     struct Vertex {
 
-        const int ALPHABET_SIZE = 1 << 8;
+        static const int ALPHABET_SIZE = 1 << 8;
         
         int move_to[ALPHABET_SIZE];
         bool terminal;
