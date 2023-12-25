@@ -11,7 +11,7 @@ StringSet<T>::Vertex::Vertex(T value)
 }
 
 template<class T>
-bool StringSet<T>::Vertex::terminate() { terminal = true; }
+void StringSet<T>::Vertex::terminate() { terminal = true; }
 
 template<class T>
 StringSet<T>::StringSet() {
@@ -25,7 +25,7 @@ int StringSet<T>::add_vertex() {
 }
 
 template<class T>
-void StringSet<T>::insert(const std::string& str, T value = T()) {
+void StringSet<T>::insert(const std::string& str, T value) {
     int cur_vert = 0;
     for (char c : str) {
         if (vertex_list[cur_vert].move_to[c] == -1) {

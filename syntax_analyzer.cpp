@@ -12,8 +12,18 @@
 extern std::vector<char> text;
 extern int pos;
 extern Lexem lexem;
+extern std::stack<std::string> st;
 
 Verdict verdict;
+
+IdentifierTIDS IdTIDS;
+FunctionTIDS FunTIDS;
+StructTIDS StrTIDS;
+
+std::string function_in_creation;
+std::string struct_in_creation;
+std::string current_type;
+Value variable_in_creation;
 
 void ReadFile(std::string file, std::vector<char>& text) {
     std::ifstream in(file);
@@ -259,7 +269,8 @@ void StructDefinition() {
         return;
     }
     variable_in_creation.set_name(Name());
-    IdTIDS.cur_tid()->push_id(Value(struct_in_creation, variable_in_creation.name()));
+    IdTIDS.cur_tid()->push_id(
+        Value(struct_in_creation, variable_in_creation.name()));
     while (lexem.content == ",") {
         GetLexem();
         variable_in_creation.set_name(Name());
@@ -276,7 +287,7 @@ void StructMember() {
     std::string object;
     for (int ind = 0; ind < (int)mem.size(); ++ind) {
         if (ind == '.') {
-            struct_in_creation = mem.substr(0, ind + 1);
+            struct_in_creation = mem.substr(0, ind);
             object = mem.substr(ind + 1);
             break;
         }
@@ -350,14 +361,14 @@ void EntityCreation(std::string str) {
 
         variable_in_creation.set_type(variable_in_creation.type() + "_array");
         IdTIDS.cur_tid()->push_id(variable_in_creation);
-        if (str != NOT_A_TYPE) StrTIDS.push_id(str, variable_in_creation.name());
+        if (str != NOT_A_TYPE) StrTIDS.push_id(str, variable_in_creation);
         reset_variable_in_creation();
 
         ArrayDeclaration();
         return;
     }
     IdTIDS.cur_tid()->push_id(variable_in_creation);
-    if (str != NOT_A_TYPE) StrTIDS.push_id(str, variable_in_creation.name());
+    if (str != NOT_A_TYPE) StrTIDS.push_id(str, variable_in_creation);
     reset_variable_in_creation();
 
     if (lexem.content == "=") {
@@ -623,23 +634,37 @@ void ArithmeticTerm() {
     }
     if (!BooleanLiteral() && !ArithmeticLiteral()) {
         if (lexem.type == identifier_type) {
-            std::string type = check_id(lexem.content);
-            push_typeop(type);
+            std::string tmp = lexem.content;
+            std::string type;
             GetLexem();
+            int pos;
+            for (pos = 0; pos < tmp.size(); ++pos) {
+                if (tmp[pos] == '.')
+                    break;
+            }
+            if (pos != tmp.size()) {
+                std::string str = tmp.substr(0, pos);
+                std::string mem = tmp.substr(pos + 1);
+                StrTIDS.check_struct_id(str);
+                
+            }
+            if (lexem.content == "(") {
+                ArgumentList();
+                return;
+            }
+            if (lexem.content == "[") {
+                GetLexem();
+                Expression();
+                eq_int();
+                if (lexem.content != "]") throw InvalidArrayIndexation();
+                GetLexem();
+                return;
+                push_typeop(type);
+                GetLexem();
+            }
+
         } else
             throw InvalidName();
-        if (lexem.content == "(") {
-            ArgumentList();
-            return;
-        }
-        if (lexem.content == "[") {
-            GetLexem();
-            Expression();
-            eq_int();
-            if (lexem.content != "]") throw InvalidArrayIndexation();
-            GetLexem();
-            return;
-        }
     }
 }
 

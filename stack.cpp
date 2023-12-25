@@ -1,6 +1,8 @@
 #include "stack.h"
 #include "CompileError.h"
 
+std::stack<std::string>st;
+
 bool is_assignment(std::string op) {
     if (op == "=" || op == "<<=" || op == ">>=" || op == "+=" || op == "-=" ||
         op == "*=" || op == "**=" || op == "/=" || op == "//=" || op == "^=" ||

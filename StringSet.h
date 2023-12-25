@@ -15,7 +15,7 @@ class StringSet {
 
         Vertex(T value = T());
 
-        bool terminate();
+        void terminate();
     };
 
     std::vector<Vertex> vertex_list;

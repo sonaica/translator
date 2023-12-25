@@ -4,8 +4,6 @@
 
 #include "lexical_analyzer.h"
 
-std::stack<std::string>st;
-
 std::string check_id(std::string name);  // its must be in the TID's functions
 //it returns the type of identificator
 void push_typeop(std::string lex);

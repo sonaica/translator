@@ -15,13 +15,13 @@ struct Value {
     void set_name(const std::string& name);
     void set_type(const std::string& type);
 
-    std::string& name();
-    std::string& type();
+    std::string name() const;
+    std::string type() const;
 
     bool operator==(const Value& other) const;
 };
 
-bool duplicates(const Value& first, const Value& second);
+bool duplicates(Value& first, Value& second);
 
 class IdentifierTIDS {
    public:
@@ -32,14 +32,14 @@ class IdentifierTIDS {
         std::vector<element*> children_;
         std::vector<Value> variables_;
 
-        element(const element* parent = nullptr);
+        element(element* parent = nullptr);
 
         void push_id(const Value& Variable);
 
-        std::string check_id(const std::string& VariableName)
+        std::string check_id(const std::string& VariableName);
     };
 
-    IdentifierTID();
+    IdentifierTIDS();
 
     element*& cur_tid();
 
@@ -67,10 +67,10 @@ struct Function {
 
     const std::string& name() const;
 
-    const std::vector<Value>& argument_list() const;
+    std::vector<Value>& argument_list();
 };
 
-bool duplicates(const Function& F1, const Function F2);
+bool duplicates(Function& F1, Function F2);
 
 class FunctionTIDS {
    public:
@@ -99,7 +99,7 @@ class StructTIDS {
    public:
     StructTIDS();
 
-    void push_id(const std::string& struct_name, const std::string& name);
+    void push_id(const std::string& struct_name, const Value& name);
 
     std::string check_id(const std::string& struct_name,
                          const std::string& name);
