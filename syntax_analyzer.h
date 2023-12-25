@@ -14,7 +14,7 @@ const std::string NOT_A_STRUCT = "";
 
 void ReadFile(std::string file, std::vector<char>& text);
 
-const std::vector<std::string> TypeList = { "int", "void", "bool", "double" };
+std::vector<std::string> TypeList = { "int", "void", "bool", "double" };
 
 // Get lexems
 

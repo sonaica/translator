@@ -251,17 +251,29 @@ void StructDefinition() {
     if (lexem.content != "struct") throw InvalidStructDefinition();
     GetLexem();
     struct_in_creation = Name();
+    TypeList.push_back(struct_in_creation);
     StrTIDS.push_struct_id(struct_in_creation);
     if (lexem.content != "{") throw InvalidStructDefinition();
     GetLexem();
     IdTIDS.create_TID();
     for (;;) {
-        if (lexem.content == "fun")
+        if (lexem.content == "fun") {
             FunctionDefinition(struct_in_creation);
-        else if (Type() != NOT_A_TYPE)
+            continue;
+        } 
+        std::string type = lexem.content;
+        bool ok = false;
+        for (const std::string& t : TypeList) {
+            if (type == t) {
+                ok = true;
+                break;
+            }
+        }
+        if (ok) {
             VariableCreation(struct_in_creation);
-        else
+        } else {
             break;
+        }
     }
     if (lexem.content != "}") throw InvalidStructDefinition();
     GetLexem();
@@ -355,7 +367,11 @@ std::string Type() {
 }
 
 void EntityCreation(std::string str) {
-    variable_in_creation.set_type(Type());
+    std::string type;
+    if ((type = Type()) == NOT_A_TYPE) {
+        StrTIDS.check_struct_id(type);
+    }
+    variable_in_creation.set_type(type);
     variable_in_creation.set_name(Name());
     if (lexem.content == "[") {
         GetLexem();
@@ -369,7 +385,10 @@ void EntityCreation(std::string str) {
         return;
     }
     IdTIDS.cur_tid()->push_id(variable_in_creation);
-    if (str != NOT_A_TYPE) StrTIDS.push_id(str, variable_in_creation);
+    
+    if (str != NOT_A_TYPE) {
+        StrTIDS.push_id(str, variable_in_creation);
+    }
     reset_variable_in_creation();
 
     if (lexem.content == "=") {
@@ -644,9 +663,9 @@ void ArithmeticTerm() {
             }
             if (pos == 0 || pos == (int)tmp.size() - 1) throw InvalidName();
             if (pos != (int)tmp.size()) {
-                std::string str = tmp.substr(0, pos);
+                std::string str_obj = tmp.substr(0, pos);
                 std::string mem = tmp.substr(pos + 1);
-                StrTIDS.check_struct_id(str);
+                std::string str = IdTIDS.cur_tid()->check_id(str_obj);
                 if (lexem.content == "(") {
                     StrTIDS.check_func_id(str, mem);
                     function_in_creation = mem;
@@ -756,8 +775,14 @@ void Operator() {
             GetLexem();
             return;
         }
-        if (lexem.content == "int" || lexem.content == "void" ||
-            lexem.content == "bool" || lexem.content == "double") {
+        bool ok = false;
+        for (const std::string& t : TypeList) {
+            if (t == lexem.content) {
+                ok = true;
+                break;
+            }
+        }
+        if (ok) {
             VariableCreation();
             return;
         }

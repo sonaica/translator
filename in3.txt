@@ -1,16 +1,12 @@
-struct str{
+struct str {
     int a;
     int b;
-    fun c() int {
-        return 5;
-    }
-}
+};
 
-пmain(){
+main(){
     int a;
     int b = a + 5;
-    double c = 2.5 << 1;
-    str ss;
+    str s;
     s.a = 6;
     return;
 }
