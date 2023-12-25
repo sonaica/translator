@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
-#include "StringSet.h"
+#include "StringSet.cpp"
 
 struct Value {
     std::string type_;

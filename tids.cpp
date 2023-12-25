@@ -1,5 +1,6 @@
+#pragma once
 #include "tids.h"
-#include "CompileError.h"
+#include "CompileError.cpp"
 
 // struct Value
 

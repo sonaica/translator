@@ -4,9 +4,9 @@
 #include <string>
 #include <vector>
 
-#include "lexical_analyzer.h"
-#include "CompileError.h"
-#include "tids.h"
+#include "lexical_analyzer.cpp"
+#include "CompileError.cpp"
+#include "tids.cpp"
 // TIDS
 
 const std::string NOT_A_TYPE = "";

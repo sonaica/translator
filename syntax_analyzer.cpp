@@ -1,3 +1,4 @@
+#pragma once
 #include "syntax_analyzer.h"
 
 #include <fstream>
@@ -5,10 +6,10 @@
 #include <string>
 #include <vector>
 
-#include "CompileError.h"
-#include "lexical_analyzer.h"
-#include "stack.h"
-#include "tids.h"
+#include "CompileError.cpp"
+#include "lexical_analyzer.cpp"
+#include "op_stack.cpp"
+#include "tids.cpp"
 extern std::vector<char> text;
 extern int pos;
 extern Lexem lexem;
@@ -642,29 +643,43 @@ void ArithmeticTerm() {
                 if (tmp[pos] == '.')
                     break;
             }
-            if (pos != tmp.size()) {
+            if (pos == 0 || pos == (int)tmp.size() - 1)
+                throw InvalidName();
+            if (pos != (int)tmp.size()) {
                 std::string str = tmp.substr(0, pos);
                 std::string mem = tmp.substr(pos + 1);
                 StrTIDS.check_struct_id(str);
-                
+                if (lexem.content == "(") {
+                    StrTIDS.check_func_id(str, mem);
+                    function_in_creation = mem;
+                    ArgumentList(str);
+                    type = StrTIDS.check_func_id(str, function_in_creation);
+                } else {
+                    type = StrTIDS.check_id(str, mem);
+                }
+            } else {
+                if (lexem.content == "(") {
+                    type = FunTIDS.check_func_id(tmp);
+                    ArgumentList();
+                    return;
+                }
+                else if (lexem.content == "[") {
+                    type = IdTIDS.cur_tid()->check_id(tmp);
+                    type = type.substr(0, type.find('_'));
+                    GetLexem();
+                    Expression();
+                    eq_int();
+                    if (lexem.content != "]") throw InvalidArrayIndexation();
+                    GetLexem();
+                    push_typeop(type);
+                }
+                else {
+                    type = IdTIDS.cur_tid()->check_id(tmp);
+                }
             }
-            if (lexem.content == "(") {
-                ArgumentList();
-                return;
-            }
-            if (lexem.content == "[") {
-                GetLexem();
-                Expression();
-                eq_int();
-                if (lexem.content != "]") throw InvalidArrayIndexation();
-                GetLexem();
-                return;
-                push_typeop(type);
-                GetLexem();
-            }
-
-        } else
+        } else {
             throw InvalidName();
+        }
     }
 }
 

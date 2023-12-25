@@ -1,3 +1,4 @@
+#pragma once
 #include "StringSet.h"
 #include <cstring>
 
@@ -43,7 +44,7 @@ std::pair<bool, T> StringSet<T>::find(const std::string& str)
     int cur_vert = 0;
     for (char c : str) {
         if (vertex_list[cur_vert].move_to[c] == -1)
-            return false;
+            return {false, T()};
         cur_vert = vertex_list[cur_vert].move_to[c];
     }
     return { vertex_list[cur_vert].terminal, vertex_list[cur_vert].extra_value };

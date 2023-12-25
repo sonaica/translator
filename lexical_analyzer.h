@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "CompileError.h"
+#include "CompileError.cpp"
 #include <map>
 
 const int keyword_type = 1;

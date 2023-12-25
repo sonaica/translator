@@ -1,3 +1,4 @@
+#pragma once
 #include "CompileError.h"
 
 CompileError::CompileError(const std::string& ErrorText)
