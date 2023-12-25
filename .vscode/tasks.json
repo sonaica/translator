@@ -5,15 +5,8 @@
             "label": "C/C++: g++ build active file",
             "command": "/usr/bin/g++",
             "args": [
-                "-fdiagnostics-color=always",
                 "-g",
                 "analyzer.cpp",
-                "lexical_analyzer.cpp",
-                "syntax_analyzer.cpp",
-                "CompileError.cpp",
-                "stack.cpp",
-                "tids.cpp",
-                "StringSet.cpp",
                 "-o",
                 "analyzer"
             ],

@@ -640,11 +640,9 @@ void ArithmeticTerm() {
             GetLexem();
             int pos;
             for (pos = 0; pos < tmp.size(); ++pos) {
-                if (tmp[pos] == '.')
-                    break;
+                if (tmp[pos] == '.') break;
             }
-            if (pos == 0 || pos == (int)tmp.size() - 1)
-                throw InvalidName();
+            if (pos == 0 || pos == (int)tmp.size() - 1) throw InvalidName();
             if (pos != (int)tmp.size()) {
                 std::string str = tmp.substr(0, pos);
                 std::string mem = tmp.substr(pos + 1);
@@ -657,13 +655,13 @@ void ArithmeticTerm() {
                 } else {
                     type = StrTIDS.check_id(str, mem);
                 }
+                push_typeop(type);
             } else {
                 if (lexem.content == "(") {
                     type = FunTIDS.check_func_id(tmp);
                     ArgumentList();
                     return;
-                }
-                else if (lexem.content == "[") {
+                } else if (lexem.content == "[") {
                     type = IdTIDS.cur_tid()->check_id(tmp);
                     type = type.substr(0, type.find('_'));
                     GetLexem();
@@ -671,11 +669,10 @@ void ArithmeticTerm() {
                     eq_int();
                     if (lexem.content != "]") throw InvalidArrayIndexation();
                     GetLexem();
-                    push_typeop(type);
-                }
-                else {
+                } else {
                     type = IdTIDS.cur_tid()->check_id(tmp);
                 }
+                push_typeop(type);
             }
         } else {
             throw InvalidName();
@@ -752,8 +749,10 @@ void Operator() {
         }
         if (lexem.content == "return") {
             GetLexem();
-            Expression();
-            if (lexem.content != ";") throw MissingSemicolumn();
+            if (lexem.content != ";") {
+                Expression();
+                if (lexem.content != ";") throw MissingSemicolumn();
+            }
             GetLexem();
             return;
         }
