@@ -7,9 +7,9 @@
 
 #include "lexical_analyzer.h"
 
-void ReadFile(std::string file, std::vector<char> &text);
+void ReadFile(std::string file, std::vector<char>& text);
 
-const std::vector<std::string> TypeList = {"int", "void", "bool", "double"};
+const std::vector<std::string> TypeList = { "int", "void", "bool", "double" };
 
 // Get lexems
 
@@ -22,10 +22,10 @@ void Directive();
 
 // Functions
 
-void FunctionDefinition();
-void FunctionParameters();
-void FunctionCall();
-void ArgumentList();
+void FunctionDefinition(std::string str);
+void FunctionParameters(std::string str);
+void FunctionCall(std::string str);
+void ArgumentList(std::string str);
 
 // Structures
 
@@ -36,14 +36,14 @@ void StructMember();
 
 void String();
 void Symbol(char symbol);
-void Name();
+std::string Name();
 void Variable();
 bool Letter(char c);
 bool SpecialSymbol(char c);
 bool Digit(char c);
-bool Type();
-void EntityCreation();
-void VariableCreation();
+std::string Type();
+void EntityCreation(std::string str);
+void VariableCreation(std::string str);
 
 // void VariableDefinition();
 //
