@@ -174,7 +174,7 @@ void FunctionParameters(std::string str) {
         StrTIDS.check_struct_id(current_type);
     }
     variable_in_creation.set_type(current_type);
-    variable_in_creation.set_type(Name());
+    variable_in_creation.set_name(Name());
     if (str == NOT_A_STRUCT)
         FunTIDS.push_func_par(function_in_creation, variable_in_creation);
     else
@@ -188,7 +188,7 @@ void FunctionParameters(std::string str) {
             StrTIDS.check_struct_id(current_type);
         }
         variable_in_creation.set_type(current_type);
-        variable_in_creation.set_type(Name());
+        variable_in_creation.set_name(Name());
         if (str == NOT_A_STRUCT)
             FunTIDS.push_func_par(function_in_creation, variable_in_creation);
         else

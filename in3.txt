@@ -1,12 +1,15 @@
-struct str {
-    int a;
-    int b;
-};
+fun f(int a, int b) int {
+    return a + b;
+}
 
 main(){
-    int a;
-    int b = a + 5;
-    str s;
-    s.a = 6;
+    int a = 0;
+    if (a) {
+        int n;
+        input n;
+        for (int i = 0; i < n; ++i){
+            f(i, i + 1);
+        }
+    }
     return;
 }

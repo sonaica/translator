@@ -113,7 +113,7 @@ void check_uno() {
 void eq_bool() {
     std::string a = st.top();
     st.pop();
-    if (a != "bool") throw InvalidTypes();
+    if (!is_type(a)) throw InvalidTypes();
 }
 
 void eq_int() {
