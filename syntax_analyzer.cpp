@@ -81,6 +81,8 @@ void reset_variable_in_creation() {
     variable_in_creation.name_ = "";
 }
 
+void reset_variable_in_creation_var() { variable_in_creation.name_ = ""; }
+
 void reset_function_in_creation() { function_in_creation = ""; }
 
 void reset_struct_in_creation() { struct_in_creation = ""; }
@@ -95,12 +97,13 @@ void Program() {
             break;
     }
     for (;;) {
+        std::string tmp;
         if (lexem.content == "fun") {
             FunctionDefinition();
         } else if (lexem.content == "struct") {
             StructDefinition();
-        } else if (Type() != NOT_A_TYPE) {
-            VariableCreation();
+        } else if ((tmp = Type()) != NOT_A_TYPE) {
+            VariableCreation("", tmp);
         } else {
             break;
         }
@@ -160,6 +163,7 @@ void FunctionDefinition(std::string str) {
     }
     IdTIDS.del_TID();
     GetLexem();
+    reset_function_in_creation();
 }
 
 void FunctionParameters(std::string str) {
@@ -197,7 +201,6 @@ void FunctionParameters(std::string str) {
         IdTIDS.cur_tid()->push_id(variable_in_creation);
         reset_variable_in_creation();
     }
-    reset_function_in_creation();
     if (lexem.content != ")") throw UndefinedFunctionParameters();
     GetLexem();
 }
@@ -212,7 +215,7 @@ void FunctionCall(std::string str) {
     reset_function_in_creation();
 }
 
-void ArgumentList(std::string str) {
+void ArgumentList(std::string str, std::string name_of_func) {
     if (lexem.content != "(") throw InvalidArgumentList();
     GetLexem();
     if (lexem.content == ")") {
@@ -220,22 +223,23 @@ void ArgumentList(std::string str) {
         return;
     }
     int par_count = 0;
-    Expression();
-    if (str == NOT_A_STRUCT)
+    ExpressionTerm();
+    if (str == NOT_A_STRUCT) {
+        if (function_in_creation == "") function_in_creation = name_of_func;
         FunTIDS.check_func_par(function_in_creation, par_count++, st.top());
-    else
+    } else
         StrTIDS.check_func_par(str, function_in_creation, par_count++,
                                st.top());
-    stack_clear();
+    stack_del();
     while (lexem.content == ",") {
         GetLexem();
-        Expression();
+        ExpressionTerm();
         if (str == NOT_A_STRUCT)
             FunTIDS.check_func_par(function_in_creation, par_count++, st.top());
         else
             StrTIDS.check_func_par(str, function_in_creation, par_count++,
                                    st.top());
-        stack_clear();
+        stack_del();
     }
     if (str == NOT_A_STRUCT)
         FunTIDS.check_param_count(function_in_creation, par_count);
@@ -260,7 +264,7 @@ void StructDefinition() {
         if (lexem.content == "fun") {
             FunctionDefinition(struct_in_creation);
             continue;
-        } 
+        }
         std::string type = lexem.content;
         bool ok = false;
         for (const std::string& t : TypeList) {
@@ -366,16 +370,18 @@ std::string Type() {
     return NOT_A_TYPE;
 }
 
-void EntityCreation(std::string str) {
-    std::string type;
-    if ((type = Type()) == NOT_A_TYPE) {
+void EntityCreation(std::string str, std::string type_) {
+    std::string type = variable_in_creation.get_type();
+    if (type == "" && (type = Type()) == NOT_A_TYPE) {
         StrTIDS.check_struct_id(type);
     }
+    if (type == "") type = type_;
+    std::string name = Name();
+    FunTIDS.check_exist_id(name);
     variable_in_creation.set_type(type);
-    variable_in_creation.set_name(Name());
+    variable_in_creation.set_name(name);
     if (lexem.content == "[") {
         GetLexem();
-
         variable_in_creation.set_type(variable_in_creation.type() + "_array");
         IdTIDS.cur_tid()->push_id(variable_in_creation);
         if (str != NOT_A_TYPE) StrTIDS.push_id(str, variable_in_creation);
@@ -385,26 +391,27 @@ void EntityCreation(std::string str) {
         return;
     }
     IdTIDS.cur_tid()->push_id(variable_in_creation);
-    
+
     if (str != NOT_A_TYPE) {
         StrTIDS.push_id(str, variable_in_creation);
     }
-    reset_variable_in_creation();
+    reset_variable_in_creation_var();
 
     if (lexem.content == "=") {
         GetLexem();
-        Expression();
+        ExpressionTerm();
         return;
     }
 }
 
-void VariableCreation(std::string str) {
-    EntityCreation(str);
+void VariableCreation(std::string str, std::string type) {
+    EntityCreation(str, type);
     while (lexem.content == ",") {
         GetLexem();
-        EntityCreation(str);
+        EntityCreation(str, type);
     }
     if (lexem.content != ";") throw InvalidVariableCreation();
+    reset_variable_in_creation();
     GetLexem();
 }
 
@@ -678,10 +685,11 @@ void ArithmeticTerm() {
             } else {
                 if (lexem.content == "(") {
                     type = FunTIDS.check_func_id(tmp);
-                    ArgumentList();
-                    return;
+                    ArgumentList("", tmp);
+                    reset_function_in_creation();
                 } else if (lexem.content == "[") {
                     type = IdTIDS.cur_tid()->check_id(tmp);
+                    if (type.find('_') == -1) throw InvalidName();
                     type = type.substr(0, type.find('_'));
                     GetLexem();
                     Expression();
@@ -818,6 +826,7 @@ void For() {
     if (lexem.content != "(") {
         throw ExpectedOpenParenthesis();
     }
+    IdTIDS.create_TID();
     GetLexem();
     VariableCreation();
     Expression();
@@ -834,6 +843,7 @@ void For() {
     }
     GetLexem();
     Operator();
+    IdTIDS.del_TID();
 }
 
 void While() {
@@ -852,7 +862,9 @@ void While() {
 }
 
 void Input() {
+    std::string tmp = lexem.content;
     Variable();
+    IdTIDS.cur_tid()->check_id(tmp);
     while (lexem.content == ",") {
         GetLexem();
         Variable();
@@ -889,7 +901,7 @@ void OutputItem() {
 }
 
 void Match() {
-    Name();
+    Expression();
     if (lexem.content != "{") {
         throw ExpectedFigureOpen();
     }
@@ -898,7 +910,7 @@ void Match() {
     while (lexem.content != "}") {
         Expression();
         stack_clear();
-        if (lexem.content != ">=") {
+        if (lexem.content != "=>") {
             throw ExpectedMatch();
         }
         GetLexem();

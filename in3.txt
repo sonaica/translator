@@ -3,13 +3,11 @@ fun f(int a, int b) int {
 }
 
 main(){
-    int a = 0;
-    if (a) {
-        int n;
-        input n;
-        for (int i = 0; i < n; ++i){
-            f(i, i + 1);
-        }
+    bool a, b;
+    int c = a + b;
+    match a {
+        5 => a = 5;
     }
+    c = f + 5;
     return;
 }

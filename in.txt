@@ -10,13 +10,13 @@ main() {
     int l = -1, r = 5;
     while (r - l > 1) {
         int mid = l + (r - l) / 2;
-        if (x > a) {
+        if (x > a[0]) {
             l = mid;
         } else {
             r = mid;
         }
     }
-    if (a == x) {
+    if (a[0] == x) {
         output "Haleluyah";
     } else {
         output "aw man";

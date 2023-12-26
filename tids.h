@@ -14,6 +14,7 @@ struct Value {
 
     void set_name(const std::string& name);
     void set_type(const std::string& type);
+    std::string get_type();
 
     std::string name() const;
     std::string type() const;
@@ -90,6 +91,8 @@ class FunctionTIDS {
 
     void check_param_count(const std::string& func_name,
                            const int& have_params);
+
+    void check_exist_id(const std::string& func_name);
 
    private:
     StringSet<Function> name_set;

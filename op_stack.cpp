@@ -128,3 +128,8 @@ void stack_clear() {
     }
     return;
 }
+
+void stack_del(){
+    st.pop();
+    return;
+}

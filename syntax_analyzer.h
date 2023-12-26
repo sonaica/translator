@@ -30,7 +30,7 @@ void Directive();
 void FunctionDefinition(std::string str = NOT_A_STRUCT);
 void FunctionParameters(std::string str = NOT_A_STRUCT);
 void FunctionCall(std::string str = NOT_A_STRUCT);
-void ArgumentList(std::string str = NOT_A_STRUCT);
+void ArgumentList(std::string str = NOT_A_STRUCT, std::string name_of_func = "");
 
 // Structures
 
@@ -47,8 +47,8 @@ bool Letter(char c);
 bool SpecialSymbol(char c);
 bool Digit(char c);
 std::string Type();
-void EntityCreation(std::string str = NOT_A_STRUCT);
-void VariableCreation(std::string str = NOT_A_STRUCT);
+void EntityCreation(std::string str = NOT_A_STRUCT, std::string type = "");
+void VariableCreation(std::string str = NOT_A_STRUCT, std::string type = "");
 
 // void VariableDefinition();
 //
@@ -126,3 +126,4 @@ void Match();
 void reset_variable_in_creation();
 void reset_function_in_creation();
 void reset_struct_in_creation();
+void reset_variable_in_creation_var();

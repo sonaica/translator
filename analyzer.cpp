@@ -16,7 +16,7 @@ bool new_line, new_line_prev;
 
 int main() {
     // std::cout << "Enter the name of file: ";
-    std::string file_in = "in3.txt", file_out = "out.txt";
+    std::string file_in = "in2.txt", file_out = "out.txt";
     const std::string file_keywords = "keywords.txt";
     CreateBor(file_keywords);
     ReadFile(file_in, text);

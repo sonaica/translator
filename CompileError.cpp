@@ -236,7 +236,7 @@ TooFewParameters::TooFewParameters(const std::string& func_name,
                                    const int& expected_num_of_params,
                                    const int& given_num_of_params)
     : CompileError("Error: function with name (" + func_name + ") expected " +
-                   std::to_string(expected_num_of_params) + "parameters, but " +
+                   std::to_string(expected_num_of_params) + " parameters, but " +
                    ((given_num_of_params == 0)
                         ? "none were given"
                         : ((given_num_of_params == 1)

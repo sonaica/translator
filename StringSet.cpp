@@ -39,12 +39,13 @@ void StringSet<T>::insert(const std::string& str, T value) {
 }
 
 template<class T>
-std::pair<bool, T> StringSet<T>::find(const std::string& str)
+std::pair<bool, T&> StringSet<T>::find(const std::string& str)
 {
     int cur_vert = 0;
     for (char c : str) {
+        T temp;
         if (vertex_list[cur_vert].move_to[c] == -1)
-            return {false, T()};
+            return {false, temp};
         cur_vert = vertex_list[cur_vert].move_to[c];
     }
     return { vertex_list[cur_vert].terminal, vertex_list[cur_vert].extra_value };
