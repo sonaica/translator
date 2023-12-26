@@ -1,13 +1,12 @@
-fun f(int a, int b) int {
-    return a + b;
-}
+struct str{
+    int a, b;
+    fun f(int a, int b) int {
+        return a + b;
+    }
+};
 
 main(){
-    bool a, b;
-    int c = a + b;
-    match a {
-        5 => a = 5;
-    }
-    c = f + 5;
+    str s;
+    int c = s.f(5, 9);
     return;
 }

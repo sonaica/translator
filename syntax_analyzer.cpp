@@ -141,6 +141,7 @@ void Directive() {
 void FunctionDefinition(std::string str) {
     if (lexem.content != "fun") throw InvalidFunctionDefinition();
     GetLexem();
+    IdTIDS.create_TID();
     function_in_creation = Name();
     if (str == NOT_A_STRUCT)
         FunTIDS.push_func_id(function_in_creation);
@@ -157,7 +158,6 @@ void FunctionDefinition(std::string str) {
         StrTIDS.push_func_return_type(str, function_in_creation, current_type);
     if (lexem.content != "{") throw InvalidFunctionDefinition();
     GetLexem();
-    IdTIDS.create_TID();
     while (lexem.content != "}") {
         Operator();
     }
