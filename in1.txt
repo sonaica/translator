@@ -6,7 +6,7 @@ int N = 100000;
 int n;
 int p[n];
 
-fun max(int a, int b) int {
+fun max(double a, double b) int {
     if (a < b) {
         return b;
     }
@@ -22,12 +22,22 @@ struct my_struct{
 
 main() {
     input n;
+    //int k;
     for (int i = 0; i < n; i)
         input p[i];
         
     int value = -1000000000;
     for (int i = 0; i < 5; ++i) {
-        value = max(value, p[i]) = 9.0;
+        //value = max(value, p[i]) = 9.0;
+        int k;
+        k = 6;
+    }
+    //k = 5;
+    if (N) {
+        //N = n + str;
+        double a, b, c;
+        //a = b & c;
+        max(a, N);
     }
     output value;
 }

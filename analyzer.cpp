@@ -15,8 +15,9 @@ Lexem lexem;
 bool new_line, new_line_prev;
 
 int main() {
+    using std::cout;
     // std::cout << "Enter the name of file: ";
-    std::string file_in = "in3.txt", file_out = "out.txt";
+    std::string file_in = "in1.txt", file_out = "out.txt";
     const std::string file_keywords = "keywords.txt";
     CreateBor(file_keywords);
     ReadFile(file_in, text);
@@ -28,8 +29,9 @@ int main() {
         if (new_line_prev) --lines;
         std::cout << "in line " << lines << ": ";
         e.what();
+        cout << '\n';
         return 1;
     }
-    std::cout << "OK";
+    std::cout << "OK\n";
     return 0;
 }
