@@ -1,12 +1,43 @@
-struct str{
-    int a, b;
-    fun f(int a, int b) int {
-        return a + b;
-    }
-};
+import "pretty_cool_file.h";
+import "C\triple\downtown_funk.cpp";
+define make_pair mp;
 
-main(){
-    str s;
-    int c = s.f(5, 9);
-    return;
+double N = 100000;
+int n;
+int p[n];
+
+fun max(double a, double b) int {
+    if (a < b) {
+        return b;
+    }
+    return a;
+}
+
+struct my_struct{
+    int a, b;
+    fun sum(int c, int d) int {
+        return c + d;
+    }
+} str, jui;
+
+main() {
+    input n;
+    //int k;
+    for (int i = 0; i < n; i)
+        input p[i];
+        
+    int value = -1000000000;
+    for (int i = 0; i < 5; ++i) {
+        //value = max(value, p[i]) = 9.0;
+        int k;
+        k = 6;
+    }
+    //k = 5;
+    if (N) {
+        //N = n + str;
+        double a, b, c;
+        //a = b & c;
+        max(a, N);
+    }
+    output value;
 }

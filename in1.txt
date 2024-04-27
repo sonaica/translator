@@ -2,7 +2,7 @@ import "pretty_cool_file.h";
 import "C\triple\downtown_funk.cpp";
 define make_pair mp;
 
-int N = 100000;
+double N = 100000;
 int n;
 int p[n];
 

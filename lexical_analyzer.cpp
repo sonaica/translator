@@ -5,6 +5,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 Vertex* root = new Vertex();
 
@@ -14,26 +15,44 @@ extern int lines;
 extern bool new_line;
 extern bool new_line_prev;
 
+Vertex::Vertex() {
+    std::fill(to, to + 256, nullptr);
+}
+
+std::vector<std::string> basic_operations = {
+    "&=", "**", "**=", "*=", "++", "+=", "--", "-=", "//=", "/=", "<<=", "=", ">>=", "^=", "|=", "~",
+    "!=", "%", "&", "*", "+", "-", "/", "<", "<<", "<=", "==", ">", ">=", ">>", "^", "|"
+}; // maybe add "."??????
+
+Lexem::Lexem() = default;
+Lexem::Lexem(const std::string &content_, int type_)
+{
+    content = content_;
+    type = type_;
+}
+
 void CreateBor(std::string file_keywords) {
     std::string str;
     std::ifstream in(file_keywords);
     while (getline(in, str)) {
         auto v = root;
         for (char c : str) {
-            c -= 'a';
-            if (!v->to[c]) v->to[c] = new Vertex();
+            if (v->to[c] == nullptr) 
+                v->to[c] = new Vertex();
             v = v->to[c];
         }
         v->terminal = true;
     }
 }
-
 bool is_operation(char c) {
     if (c == '=' || c == '+' || c == '-' || c == '~' || c == '&' || c == '|' ||
         c == '*' || c == '>' || c == '<' || c == '/' || c == '^' || c == '%' ||
         c == '.' || c == '!')
         return true;
     return false;
+}
+bool is_operation(const std::string& op) {
+    return std::find(basic_operations.begin(), basic_operations.end(), op) != basic_operations.end();
 }
 
 bool is_letter(char c) {
@@ -49,27 +68,18 @@ bool is_digit(char c) {
 
 bool is_keyword(std::string keyword) {
     auto v = root;
-    for (int i = 0; i < keyword.length(); ++i) {
-        if (v == nullptr) return false;
+    for (int i = 0; i < keyword.length() && v != nullptr; ++i) {
         v = v->to[keyword[i]];
     }
-    if (v != nullptr && v->terminal) return true;
-    return false;
+    return (v != nullptr && v->terminal);
 }
 
 bool is_alphabet(char c) {
     if (is_digit(c) || is_letter(c) || is_operation(c) || c == '(' ||
         c == ')' || c == '{' || c == '}' || c == ';' || c == ',' || c == '.' ||
-        c == '[' || c == ']')
+        c == '[' || c == ']' || c == EOF)
         return true;
     return false;
-}
-
-Lexem create_lexem(std::string str, int type) {
-    Lexem lex;
-    lex.content = str;
-    lex.type = type;
-    return lex;
 }
 
 void update_line(bool f) {
@@ -109,22 +119,22 @@ Verdict FSM() {
                 } else if (cur == ',') {
                     current_lexem += cur;
                     ++pos;
-                    verdict_return.lexem = create_lexem(current_lexem, 9);
+                    verdict_return.lexem = Lexem(current_lexem, 9);
                     return verdict_return;
                 } else if (cur == '(' || cur == ')') {
                     current_lexem += cur;
                     ++pos;
-                    verdict_return.lexem = create_lexem(current_lexem, 10);
+                    verdict_return.lexem = Lexem(current_lexem, 10);
                     return verdict_return;
                 } else if (cur == '[' || cur == ']') {
                     current_lexem += cur;
                     ++pos;
-                    verdict_return.lexem = create_lexem(current_lexem, 11);
+                    verdict_return.lexem = Lexem(current_lexem, 11);
                     return verdict_return;
                 } else if (cur == '{' || cur == '}' || cur == ';') {
                     current_lexem += cur;
                     ++pos;
-                    verdict_return.lexem = create_lexem(current_lexem, 8);
+                    verdict_return.lexem = Lexem(current_lexem, 8);
                     return verdict_return;
                 } else if (cur == '\n') {
                     ++lines;
@@ -139,6 +149,15 @@ Verdict FSM() {
                     ++pos;
                     state = States::Literal_String;
                 } else if (!is_alphabet(cur)) {
+                    // ULTRA MEGA KOSTIL
+                    // ...
+                    if (cur == 0) {
+                        verdict_return.is_error = false;
+                        verdict_return.type = 0;
+                        return verdict_return;
+                    }
+                    // ...
+                    // FIN
                     verdict_return.is_error = true;
                     verdict_return.type = 1;
                     return verdict_return;
@@ -167,31 +186,32 @@ Verdict FSM() {
                         if (current_lexem == "true" ||
                             current_lexem == "false") {
                             verdict_return.lexem =
-                                create_lexem(current_lexem, literal_bool_type);
+                                Lexem(current_lexem, literal_bool_type);
                             return verdict_return;
                         } else if (current_lexem == "and" ||
                                    current_lexem == "or") {
                             verdict_return.lexem =
-                                create_lexem(current_lexem, operation_type);
+                                Lexem(current_lexem, operation_type);
                             return verdict_return;
                         } else {
                             verdict_return.lexem =
-                                create_lexem(current_lexem, keyword_type);
+                                Lexem(current_lexem, keyword_type);
                             return verdict_return;
                         }
                     }
                     verdict_return.lexem =
-                        create_lexem(current_lexem, identifier_type);
+                        Lexem(current_lexem, identifier_type);
                     return verdict_return;
                 }
                 break;
             case States::Operation:
+                //if (is_operation(cur) && is_operation(current_lexem + cur))
                 if (is_operation(cur)) {
                     current_lexem += cur;
                     ++pos;
                 } else {
                     verdict_return.lexem =
-                        create_lexem(current_lexem, operation_type);
+                        Lexem(current_lexem, operation_type);
                     return verdict_return;
                 }
                 break;
@@ -209,7 +229,7 @@ Verdict FSM() {
                     return verdict_return;
                 } else {
                     verdict_return.lexem =
-                        create_lexem(current_lexem, literal_int_type);
+                        Lexem(current_lexem, literal_int_type);
                     return verdict_return;
                 }
                 break;
@@ -219,7 +239,7 @@ Verdict FSM() {
                     ++pos;
                 } else {
                     verdict_return.lexem =
-                        create_lexem(current_lexem, literal_double_type);
+                        Lexem(current_lexem, literal_double_type);
                     return verdict_return;
                 }
                 break;
@@ -237,7 +257,7 @@ Verdict FSM() {
                     current_lexem += cur;
                     ++pos;
                     verdict_return.lexem =
-                        create_lexem(current_lexem, string_literal_type);
+                        Lexem(current_lexem, string_literal_type);
                     return verdict_return;
                 }
                 break;
@@ -245,3 +265,4 @@ Verdict FSM() {
     }
     return verdict_return;
 }
+
