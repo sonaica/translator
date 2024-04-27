@@ -29,4 +29,6 @@ public:
     void insert(const std::string& str, T value = T());
 
     std::pair<bool,T&> find(const std::string& str);
+
+    T& operator[](const std::string& str);
 };

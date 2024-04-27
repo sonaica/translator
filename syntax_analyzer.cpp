@@ -1,15 +1,17 @@
 #pragma once
 #include "syntax_analyzer.h"
+#include "poliz.cpp"
 
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <vector>
+#include <iterator>
 
 #include "CompileError.cpp"
 #include "lexical_analyzer.cpp"
 #include "op_stack.cpp"
-#include "tids.cpp"
+#include "global_tids.hpp"
 extern std::vector<char> text;
 extern int pos;
 extern Lexem lexem;
@@ -17,9 +19,9 @@ extern std::stack<std::string> st;
 
 Verdict verdict;
 
-IdentifierTIDS IdTIDS;
-FunctionTIDS FunTIDS;
-StructTIDS StrTIDS;
+extern IdentifierTIDS IdTIDS;
+extern FunctionTIDS FunTIDS;
+extern StructTIDS StrTIDS;
 
 std::string function_in_creation;
 std::string struct_in_creation;
@@ -41,6 +43,12 @@ void ReadFile(std::string file, std::vector<char>& text) {
         }
         in.close();
         delete[] buffer;
+    }
+    while (!text.empty() && text.back() != '}')
+        text.pop_back();
+    if (text.empty()) {
+        std::cout << "We don't compile void here";
+        exit(0);
     }
 }
 
@@ -89,7 +97,7 @@ void reset_struct_in_creation() { struct_in_creation = ""; }
 
 // Program Structure
 
-void Program() {
+size_t Program() {
     for (;;) {
         if (lexem.content == "import" || lexem.content == "define")
             Directive();
@@ -114,7 +122,11 @@ void Program() {
     GetLexem();
     if (lexem.content != ")") throw UndefinedMainFunctionError();
     GetLexem();
+    size_t pos = cur_ptr();
     Operator();
+    while (!IdTIDS.is_empty())
+        IdTIDS.del_TID();
+    return pos;
 }
 
 void Directive() {
@@ -139,6 +151,7 @@ void Directive() {
 // Functions
 
 void FunctionDefinition(std::string str) {
+    // Poliz done
     if (lexem.content != "fun") throw InvalidFunctionDefinition();
     GetLexem();
     IdTIDS.create_TID();
@@ -152,15 +165,21 @@ void FunctionDefinition(std::string str) {
         current_type = Name();
         StrTIDS.check_struct_id(current_type);
     }
-    if (str == NOT_A_STRUCT)
+    if (str == NOT_A_STRUCT) {
         FunTIDS.push_func_return_type(function_in_creation, current_type);
-    else
+        FunTIDS.push_func_poliz_pos(function_in_creation, cur_ptr());
+    } else {
         StrTIDS.push_func_return_type(str, function_in_creation, current_type);
+        StrTIDS.push_func_poliz_pos(str, function_in_creation, cur_ptr());
+    }
     if (lexem.content != "{") throw InvalidFunctionDefinition();
     GetLexem();
+    
     while (lexem.content != "}") {
         Operator();
     }
+
+    push_stack(poliz_element(ELEMENT_TYPE::END_OF_FUNCTION));
     IdTIDS.del_TID();
     GetLexem();
     reset_function_in_creation();
@@ -205,15 +224,15 @@ void FunctionParameters(std::string str) {
     GetLexem();
 }
 
-void FunctionCall(std::string str) {
-    function_in_creation = Name();
-    if (str == NOT_A_STRUCT)
-        FunTIDS.check_func_id(function_in_creation);
-    else
-        StrTIDS.check_func_id(str, function_in_creation);
-    ArgumentList(str);
-    reset_function_in_creation();
-}
+// void FunctionCall(std::string str) {
+//     function_in_creation = Name();
+//     if (str == NOT_A_STRUCT)
+//         FunTIDS.check_func_id(function_in_creation);
+//     else
+//         StrTIDS.check_func_id(str, function_in_creation);
+//     ArgumentList(str);
+//     reset_function_in_creation();
+// }
 
 void ArgumentList(std::string str, std::string name_of_func) {
     if (lexem.content != "(") throw InvalidArgumentList();
@@ -260,6 +279,7 @@ void StructDefinition() {
     if (lexem.content != "{") throw InvalidStructDefinition();
     GetLexem();
     IdTIDS.create_TID();
+
     for (;;) {
         if (lexem.content == "fun") {
             FunctionDefinition(struct_in_creation);
@@ -285,6 +305,7 @@ void StructDefinition() {
         GetLexem();
         return;
     }
+    IdTIDS.del_TID();
     variable_in_creation.set_name(Name());
     IdTIDS.cur_tid()->push_id(
         Value(struct_in_creation, variable_in_creation.name()));
@@ -352,7 +373,8 @@ std::string Name() {
 }
 
 void Variable() {
-    Name();
+    std::string str = Name();
+    push_stack(poliz_element(ELEMENT_TYPE::VARIABLE_OPERAND, str));
     if (lexem.content == "[") {
         GetLexem();
         Expression();
@@ -380,16 +402,25 @@ void EntityCreation(std::string str, std::string type_) {
     FunTIDS.check_exist_id(name);
     variable_in_creation.set_type(type);
     variable_in_creation.set_name(name);
+
     if (lexem.content == "[") {
         GetLexem();
         variable_in_creation.set_type(variable_in_creation.type() + "_array");
+        type += "_array";
         IdTIDS.cur_tid()->push_id(variable_in_creation);
         if (str != NOT_A_TYPE) StrTIDS.push_id(str, variable_in_creation);
         reset_variable_in_creation();
 
+        push_stack(poliz_element(ELEMENT_TYPE::OPERAND, type));
+        push_stack(poliz_element(ELEMENT_TYPE::OPERAND, name));
+
         ArrayDeclaration();
+
         return;
     }
+    push_stack(poliz_element(ELEMENT_TYPE::OPERAND, type));
+    push_stack(poliz_element(ELEMENT_TYPE::OPERAND, name));
+    push_stack(poliz_element(ELEMENT_TYPE::MAKE_VARIABLE));
     IdTIDS.cur_tid()->push_id(variable_in_creation);
 
     if (str != NOT_A_TYPE) {
@@ -398,13 +429,19 @@ void EntityCreation(std::string str, std::string type_) {
     reset_variable_in_creation_var();
 
     if (lexem.content == "=") {
+        push_stack(poliz_element(ELEMENT_TYPE::PARENTHESIS, "("));
+        push_stack(poliz_element(ELEMENT_TYPE::VARIABLE_OPERAND, name));
+        push_stack(poliz_element(ELEMENT_TYPE::OPERATOR, "="));
         GetLexem();
         ExpressionTerm();
+        push_stack(poliz_element(ELEMENT_TYPE::PARENTHESIS, ")"));
+        
         return;
     }
 }
 
 void VariableCreation(std::string str, std::string type) {
+    // POLIZ DONE - i think
     EntityCreation(str, type);
     while (lexem.content == ",") {
         GetLexem();
@@ -415,33 +452,34 @@ void VariableCreation(std::string str, std::string type) {
     GetLexem();
 }
 
-bool Sign() {
-    if (lexem.content == "+" || lexem.content == "-") {
-        GetLexem();
-        return true;
-    }
-    return false;
-}
+// bool Sign() {
+//     if (lexem.content == "+" || lexem.content == "-") {
+//         GetLexem();
+//         return true;
+//     }
+//     return false;
+// }
 
-bool SignedNumber() {
-    if (!Sign()) {
-        return UnsignedNumber();
-    } else {
-        return UnsignedNumber();
-    }
-}
+// bool SignedNumber() {
+//     if (!Sign()) {
+//         return UnsignedNumber();
+//     } else {
+//         return UnsignedNumber();
+//     }
+// }
 
-bool UnsignedNumber() {
-    for (char c : lexem.content) {
-        if (!Digit(c)) return false;
-    }
-    GetLexem();
-    return true;
-}
+// bool UnsignedNumber() {
+//     for (char c : lexem.content) {
+//         if (!Digit(c)) return false;
+//     }
+//     GetLexem();
+//     return true;
+// }
 
 // Expression
 
 void Expression() {
+    // POLIZ DONE - i think
     ExpressionTerm();
     while (lexem.content == ",") {
         GetLexem();
@@ -449,15 +487,25 @@ void Expression() {
     }
 }
 
-void ExpressionTerm() { ArithmeticExpression(); }
+// EXPRESSION TERM - POLIZ DONE
+void ExpressionTerm() { 
+    push_stack(poliz_element(ELEMENT_TYPE::PARENTHESIS, "("));
+    ArithmeticExpression(); 
+    push_stack(poliz_element(ELEMENT_TYPE::PARENTHESIS, ")"));
+}
 
 // Arithmetic, logic and comparison
 
 void ArithmeticExpression() { AssignmentTerm(); }
 
 bool Unary() {
+    // Poliz done
     if (lexem.content == "+" || lexem.content == "-" || lexem.content == "++" ||
         lexem.content == "--" || lexem.content == "~") {
+        std::string op = lexem.content;
+        if (op == "-" || op == "+")
+            op += 'u';
+        push_stack(poliz_element(ELEMENT_TYPE::OPERATOR, op));
         push_typeop(lexem.content);
         GetLexem();
         return true;
@@ -466,7 +514,9 @@ bool Unary() {
 }
 
 bool Mul() {
+    // Poliz done
     if (lexem.content == "*" || lexem.content == "/" || lexem.content == "%") {
+        push_stack(poliz_element(ELEMENT_TYPE::OPERATOR, lexem.content));
         push_typeop(lexem.content);
         GetLexem();
         return true;
@@ -475,7 +525,9 @@ bool Mul() {
 }
 
 bool Sum() {
+    // Poliz done
     if (lexem.content == "+" || lexem.content == "-") {
+        push_stack(poliz_element(ELEMENT_TYPE::OPERATOR, lexem.content));
         push_typeop(lexem.content);
         GetLexem();
         return true;
@@ -484,7 +536,9 @@ bool Sum() {
 }
 
 bool Power() {
+    // Poliz done
     if (lexem.content == "**") {
+        push_stack(poliz_element(ELEMENT_TYPE::OPERATOR, lexem.content));
         push_typeop(lexem.content);
         GetLexem();
         return true;
@@ -493,7 +547,9 @@ bool Power() {
 }
 
 bool And() {
+    // Poliz done
     if (lexem.content == "&" || lexem.content == "and") {
+        push_stack(poliz_element(ELEMENT_TYPE::OPERATOR, lexem.content));
         push_typeop(lexem.content);
         GetLexem();
         return true;
@@ -502,7 +558,9 @@ bool And() {
 }
 
 bool Xor() {
+    // Poliz done
     if (lexem.content == "^") {
+        push_stack(poliz_element(ELEMENT_TYPE::OPERATOR, lexem.content));
         push_typeop(lexem.content);
         GetLexem();
         return true;
@@ -511,7 +569,9 @@ bool Xor() {
 }
 
 bool Or() {
+    // Poliz done
     if (lexem.content == "|" || lexem.content == "or") {
+        push_stack(poliz_element(ELEMENT_TYPE::OPERATOR, lexem.content));
         push_typeop(lexem.content);
         GetLexem();
         return true;
@@ -520,7 +580,9 @@ bool Or() {
 }
 
 bool Shift() {
+    // Poliz done
     if (lexem.content == "<<" || lexem.content == ">>") {
+        push_stack(poliz_element(ELEMENT_TYPE::OPERATOR, lexem.content));
         push_typeop(lexem.content);
         GetLexem();
         return true;
@@ -529,7 +591,9 @@ bool Shift() {
 }
 
 bool Equality() {
+    // Poliz done
     if (lexem.content == "==" || lexem.content == "!=") {
+        push_stack(poliz_element(ELEMENT_TYPE::OPERATOR, lexem.content));
         push_typeop(lexem.content);
         GetLexem();
         return true;
@@ -538,8 +602,10 @@ bool Equality() {
 }
 
 bool NonEquality() {
+    // Poliz done
     if (lexem.content == "<" || lexem.content == ">" || lexem.content == "<=" ||
         lexem.content == ">=") {
+        push_stack(poliz_element(ELEMENT_TYPE::OPERATOR, lexem.content));
         push_typeop(lexem.content);
         GetLexem();
         return true;
@@ -548,6 +614,7 @@ bool NonEquality() {
 }
 
 bool Assignment() {
+    // Poliz done
     if (lexem.content == "=" || lexem.content == "<<=" ||
         lexem.content == ">>=" || lexem.content == "+=" ||
         lexem.content == "-=" || lexem.content == "*=" ||
@@ -555,6 +622,7 @@ bool Assignment() {
         lexem.content == "//=" || lexem.content == "^=" ||
         lexem.content == "&=" || lexem.content == "|=" ||
         lexem.content == "%=") {
+        push_stack(poliz_element(ELEMENT_TYPE::OPERATOR, lexem.content));
         push_typeop(lexem.content);
         GetLexem();
         return true;
@@ -578,7 +646,7 @@ void PowerTerm() {
         check_bin();
     }
 }
-// dopilit
+
 void MulTerm() {
     PowerTerm();
     while (Mul()) {
@@ -652,15 +720,20 @@ void AssignmentTerm() {
 }
 
 void ArithmeticTerm() {
+    // POLIZ DONE
     if (lexem.content == "(") {
+        push_stack(poliz_element(ELEMENT_TYPE::PARENTHESIS, "("));
         GetLexem();
         Expression();
         if (lexem.content != ")") throw InvalidArithmeticTerm();
         GetLexem();
+        push_stack(poliz_element(ELEMENT_TYPE::PARENTHESIS, ")"));
         return;
     }
     if (!BooleanLiteral() && !ArithmeticLiteral()) {
+        
         if (lexem.type == identifier_type) {
+        
             std::string tmp = lexem.content;
             std::string type;
             GetLexem();
@@ -670,34 +743,61 @@ void ArithmeticTerm() {
             }
             if (pos == 0 || pos == (int)tmp.size() - 1) throw InvalidName();
             if (pos != (int)tmp.size()) {
+                // SOME STRUCT OBJECT
                 std::string str_obj = tmp.substr(0, pos);
                 std::string mem = tmp.substr(pos + 1);
                 std::string str = IdTIDS.cur_tid()->check_id(str_obj);
                 if (lexem.content == "(") {
+                    // STRUCT FUNCTION - POLIZ DONE
                     StrTIDS.check_func_id(str, mem);
                     function_in_creation = mem;
                     ArgumentList(str);
                     type = StrTIDS.check_func_id(str, function_in_creation);
+                    push_stack(poliz_element(ELEMENT_TYPE::FUNCTION_NAME, tmp));
+                    push_stack(poliz_element(ELEMENT_TYPE::OPERATOR, "()"));
+                } else if (lexem.content == "[") {
+                    // STRUCT ARRAY - POLIZ DONE
+                    type = StrTIDS.check_id(str, tmp);
+                    if (type.find('_') == -1) throw InvalidName();
+                    type = type.substr(0, type.find('_'));
+                    push_stack(poliz_element(ELEMENT_TYPE::OPERAND, tmp));
+                    GetLexem();
+                    Expression();
+                    eq_int();
+                    if (lexem.content != "]") throw InvalidArrayIndexation();
+                    push_stack(poliz_element(ELEMENT_TYPE::OPERATOR, "[]"));
+                    GetLexem();
                 } else {
+                    // STRUCT VARIABLE - POLIZ DONE
                     type = StrTIDS.check_id(str, mem);
+                    push_stack(poliz_element(ELEMENT_TYPE::OPERAND, tmp));
                 }
+                push_stack(poliz_element(ELEMENT_TYPE::OPERATOR, "."));
                 push_typeop(type);
             } else {
                 if (lexem.content == "(") {
+                    // FUNCTION - POLIZ DONE
                     type = FunTIDS.check_func_id(tmp);
                     ArgumentList("", tmp);
                     reset_function_in_creation();
+                    push_stack(poliz_element(ELEMENT_TYPE::FUNCTION_NAME, tmp));
+                    push_stack(poliz_element(ELEMENT_TYPE::OPERATOR, "()"));
                 } else if (lexem.content == "[") {
+                    // ARRAY - POLIZ DONE
                     type = IdTIDS.cur_tid()->check_id(tmp);
                     if (type.find('_') == -1) throw InvalidName();
                     type = type.substr(0, type.find('_'));
+                    push_stack(poliz_element(ELEMENT_TYPE::OPERAND, tmp));
                     GetLexem();
                     Expression();
                     eq_int();
                     if (lexem.content != "]") throw InvalidArrayIndexation();
                     GetLexem();
+                    push_stack(poliz_element(ELEMENT_TYPE::OPERATOR, "[]"));
                 } else {
+                    // ONLY VARIABLE - POLIZ DONE
                     type = IdTIDS.cur_tid()->check_id(tmp);
+                    push_stack(poliz_element(ELEMENT_TYPE::VARIABLE_OPERAND, tmp));
                 }
                 push_typeop(type);
             }
@@ -708,7 +808,9 @@ void ArithmeticTerm() {
 }
 
 bool BooleanLiteral() {
+    // Poliz done
     if (lexem.type == literal_bool_type) {
+        push_stack(poliz_element(ELEMENT_TYPE::LITERAL_OPERAND, std::to_string(lexem.type) + "_" + lexem.content));
         push_typeop("bool");
         GetLexem();
         return true;
@@ -717,7 +819,9 @@ bool BooleanLiteral() {
 }
 
 bool ArithmeticLiteral() {
+    // Poliz Done
     if (lexem.type == literal_int_type || lexem.type == literal_double_type) {
+        push_stack(poliz_element(ELEMENT_TYPE::LITERAL_OPERAND, std::to_string(lexem.type) + "_" + lexem.content));
         if (lexem.type == literal_double_type)
             push_typeop("double");
         else
@@ -737,49 +841,59 @@ bool ArithmeticLiteral() {
 void Operator() {
     if (lexem.content == "{") {
         IdTIDS.create_TID();
+        push_stack(poliz_element(ELEMENT_TYPE::CREATE_TID));
         GetLexem();
         while (lexem.content != "}") {
             Operator();
         }
         IdTIDS.del_TID();
+        push_stack(poliz_element(ELEMENT_TYPE::DELETE_TID));
         GetLexem();
     } else {
         if (lexem.content == "if") {
+            // Poliz done
             GetLexem();
             If();
             return;
         }
         if (lexem.content == "while") {
+            // Poliz done
             GetLexem();
             While();
             return;
         }
         if (lexem.content == "for") {
+            // Poliz done
             GetLexem();
             For();
             return;
         }
         if (lexem.content == "input") {
+            // Poliz done (i think)
             GetLexem();
             Input();
             return;
         }
         if (lexem.content == "output") {
+            // Poliz done (i think)
             GetLexem();
             Output();
             return;
         }
         if (lexem.content == "match") {
+            // Poliz done (i think)
             GetLexem();
             Match();
             return;
         }
         if (lexem.content == "return") {
+            // Poliz done
             GetLexem();
             if (lexem.content != ";") {
                 Expression();
                 if (lexem.content != ";") throw MissingSemicolumn();
             }
+            push_stack(poliz_element(ELEMENT_TYPE::RETURN_OPERATOR));
             GetLexem();
             return;
         }
@@ -810,16 +924,31 @@ void If() {
     GetLexem();
     Expression();
     eq_bool();
+
+    size_t p1 = cur_ptr();
+    poliz_blank();
+    push_stack(poliz_element(ELEMENT_TYPE::MOVE_BY_FALSE));
+
     stack_clear();
     if (lexem.content != ")") {
         throw ExpectedCloseParenthesis();
     }
     GetLexem();
+    
     Operator();
+
+    size_t p2 = cur_ptr();
+    poliz_blank();
+    push_stack(poliz_element(ELEMENT_TYPE::UNCOND_MOVE));
+
+    poliz[p1] = cur_ptr();
+
     if (lexem.content == "else") {
         GetLexem();
         Operator();
     }
+
+    poliz[p2] = cur_ptr();
 }
 
 void For() {
@@ -827,68 +956,112 @@ void For() {
         throw ExpectedOpenParenthesis();
     }
     IdTIDS.create_TID();
+    push_stack(poliz_element(ELEMENT_TYPE::CREATE_TID));
     GetLexem();
     VariableCreation();
+
+    size_t p3 = cur_ptr();
     Expression();
     stack_clear();
+    size_t p1 = cur_ptr();
+    poliz_blank();
+    push_stack(poliz_element(ELEMENT_TYPE::MOVE_BY_FALSE));
+    size_t p2 = cur_ptr();
+    poliz_blank();
+    push_stack(poliz_element(ELEMENT_TYPE::UNCOND_MOVE));
     if (lexem.content != ";") {
         throw MissingSemicolumn();
     }
+    size_t p4 = cur_ptr();
     GetLexem();
     Expression();
     eq_bool();
     stack_clear();
+    push_stack(p3);
+    push_stack(poliz_element(ELEMENT_TYPE::UNCOND_MOVE));
+    push_stack(poliz_element(ELEMENT_TYPE::OPERATOR, ";"));
+    poliz[p2] = cur_ptr();
     if (lexem.content != ")") {
         throw ExpectedCloseParenthesis();
     }
     GetLexem();
     Operator();
+    
+    
+    push_stack(p4);
+    push_stack(ELEMENT_TYPE::UNCOND_MOVE);
+    poliz[p1] = cur_ptr();
     IdTIDS.del_TID();
+    push_stack(poliz_element(ELEMENT_TYPE::DELETE_TID));
 }
 
 void While() {
     if (lexem.content != "(") {
         throw ExpectedOpenParenthesis();
     }
+    size_t p1 = cur_ptr();
     GetLexem();
     Expression();
     eq_bool();
     stack_clear();
+
+    size_t p2 = cur_ptr();
+    poliz_blank();
+    push_stack(poliz_element(MOVE_BY_FALSE));
+
     if (lexem.content != ")") {
         throw ExpectedCloseParenthesis();
     }
+
     GetLexem();
     Operator();
+    push_stack(poliz_element(p1));
+    push_stack(poliz_element(ELEMENT_TYPE::UNCOND_MOVE));
+    poliz[p2] = cur_ptr();
 }
 
 void Input() {
     std::string tmp = lexem.content;
+    push_stack(poliz_element(ELEMENT_TYPE::PARENTHESIS, "("));
     Variable();
     IdTIDS.cur_tid()->check_id(tmp);
+    size_t count_operands = 1;
     while (lexem.content == ",") {
         GetLexem();
         Variable();
+        ++count_operands;
     }
     if (lexem.content != ";") {
         throw MissingSemicolumn();
     }
+    
+    push_stack(poliz_element(ELEMENT_TYPE::LITERAL_OPERAND, std::to_string(literal_int_type) + "_" + std::to_string(count_operands)));
+    push_stack(poliz_element(ELEMENT_TYPE::OPERATOR, "input"));
+    push_stack(poliz_element(ELEMENT_TYPE::PARENTHESIS, ")"));
     GetLexem();
 }
 
 void Output() {
+    size_t count_operands = 1;
+    push_stack(poliz_element(ELEMENT_TYPE::PARENTHESIS, "("));
     OutputItem();
     while (lexem.content == ",") {
         GetLexem();
         OutputItem();
+        ++count_operands;
     }
     if (lexem.content != ";") {
         throw MissingSemicolumn();
     }
+    push_stack(poliz_element(ELEMENT_TYPE::LITERAL_OPERAND, std::to_string(literal_int_type) + "_" + std::to_string(count_operands)));
+    push_stack(poliz_element(ELEMENT_TYPE::OPERATOR, "output"));
+    push_stack(poliz_element(ELEMENT_TYPE::PARENTHESIS, ")"));
     GetLexem();
 }
 
 void OutputItem() {
     if (lexem.type == string_literal_type) {
+        push_stack(poliz_element(ELEMENT_TYPE::LITERAL_OPERAND, std::to_string(lexem.type) + "_" + lexem.content));
         GetLexem();
         return;
     }
@@ -897,7 +1070,7 @@ void OutputItem() {
     //     return;
     // }
     if (lexem.content[0] == '\"') throw InvalidStringLiteral();
-    Expression();
+    ExpressionTerm();
 }
 
 void Match() {
@@ -905,18 +1078,42 @@ void Match() {
     if (lexem.content != "{") {
         throw ExpectedFigureOpen();
     }
-    IdTIDS.create_TID();
+    push_stack(poliz_element(ELEMENT_TYPE::REM_MATCH_MAIN_TERM));
     GetLexem();
+    size_t p = cur_ptr();
+    poliz_blank();
+    push_stack(poliz_element(ELEMENT_TYPE::UNCOND_MOVE));
+
+    vector<size_t> pts;
+    vector<size_t> to_fill;
     while (lexem.content != "}") {
         Expression();
         stack_clear();
+        push_stack(poliz_element(ELEMENT_TYPE::REM_MATCH_CASE));
         if (lexem.content != "=>") {
             throw ExpectedMatch();
         }
+        pts.push_back(cur_ptr());
         GetLexem();
         Operator();
+        to_fill.push_back(cur_ptr());
+        poliz_blank();
+        push_stack(poliz_element(ELEMENT_TYPE::UNCOND_MOVE));
     }
-    IdTIDS.del_TID();
+    poliz[p] = cur_ptr();
+    for (int i = 0; i < (int)pts.size(); ++i) {
+        push_stack(poliz_element(ELEMENT_TYPE::PARENTHESIS, "("));
+        push_stack(poliz_element(ELEMENT_TYPE::GET_MATCH_MAIN_TERM));
+        push_stack(poliz_element(ELEMENT_TYPE::GET_CASE_TERM, std::to_string(i)));
+        push_stack(poliz_element(ELEMENT_TYPE::OPERATOR, "=="));
+        push_stack(poliz_element(pts[i]));
+        push_stack(poliz_element(ELEMENT_TYPE::PARENTHESIS, ")"));
+        push_stack(poliz_element(ELEMENT_TYPE::MOVE_BY_TRUE));
+        
+    }
+    for (size_t x : to_fill) {
+        poliz[x] = cur_ptr();
+    }
     GetLexem();
 }
 
@@ -924,8 +1121,10 @@ void ArrayDeclaration() {
     if (lexem.content == "]") {
         GetLexem();
         ArrayDeclarationAuto();
+        push_stack(poliz_element(ELEMENT_TYPE::MAKE_ARRAY_AUTO));
     } else {
         ArrayDeclarationExact();
+        push_stack(poliz_element(ELEMENT_TYPE::MAKE_ARRAY_EXACT));
     }
 }
 
@@ -974,6 +1173,8 @@ void ArrayDeclarationExact() {
     }
 }
 
+// is not used anywhere
+/*
 void ArrayIndexation() {
     Name();
     if (lexem.content != "[") {
@@ -985,12 +1186,16 @@ void ArrayIndexation() {
     if (lexem.content != "]") {
         throw ExpectedSquareClose();
     }
+    push_stack(poliz_element(ELEMENT_TYPE::GET_ARRAY_ELEMENT));
     GetLexem();
 }
+*/
 
 void Literal() {
+    // Poliz done
     if (lexem.content == "false" || lexem.content == "true") {
         BooleanLiteral();
-    } else
+    } else {
         ArithmeticLiteral();
+    }
 }

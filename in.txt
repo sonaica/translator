@@ -1,24 +1,20 @@
 import "math.h";
 define for fon;
 
-struct cool_struct {};
+struct cool_struct {
+    int a[3];
+    fun f(int a) int {
+        return a;
+    }
+} c;
+
+cool_struct imposter;
 
 main() {
+    output c.f(6);
     int a[5];
     int x;
-    input a, x;
-    int l = -1, r = 5;
-    while (r - l > 1) {
-        int mid = l + (r - l) / 2;
-        if (x > a[0]) {
-            l = mid;
-        } else {
-            r = mid;
-        }
-    }
-    if (a[0] == x) {
-        output "Haleluyah";
-    } else {
-        output "aw man";
+    for (int i = 0; i < 2; ++i) {
+        output "hello";
     }
 }

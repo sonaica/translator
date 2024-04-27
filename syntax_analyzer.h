@@ -22,7 +22,7 @@ void GetLexem();
 
 // Program Structure
 
-void Program();
+size_t Program();
 void Directive();
 
 // Functions

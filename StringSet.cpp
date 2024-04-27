@@ -50,3 +50,9 @@ std::pair<bool, T&> StringSet<T>::find(const std::string& str)
     }
     return { vertex_list[cur_vert].terminal, vertex_list[cur_vert].extra_value };
 }
+
+template <class T>
+T &StringSet<T>::operator[](const std::string &str)
+{
+    return find(str).second;
+}

@@ -1,12 +1,14 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "uni_ptr.cpp"
 
 #include "StringSet.cpp"
 
 struct Value {
     std::string type_;
     std::string name_;
+    uni_ptr ptr;
 
     Value();
 
@@ -28,16 +30,20 @@ class IdentifierTIDS {
    public:
     struct element {
         StringSet<std::string> name_set;
+        StringSet<cool_byte*> adr_name_set;
 
         element* parent_;
-        std::vector<element*> children_;
         std::vector<Value> variables_;
+
+        ~element();
 
         element(element* parent = nullptr);
 
         void push_id(const Value& Variable);
 
         std::string check_id(const std::string& VariableName);
+
+        cool_byte* find_id(const std::string& VariableName);
     };
 
     IdentifierTIDS();
@@ -47,6 +53,8 @@ class IdentifierTIDS {
     void create_TID();
 
     void del_TID();
+    
+    bool is_empty() const;
 
    private:
     element* cur_tid_;
@@ -58,15 +66,19 @@ struct Function {
     std::string name_;
     std::string return_type_;
     std::vector<Value> argument_list_;
+    size_t poliz_pos_;
 
     void set_name(const std::string& name);
     void set_return_type(const std::string& type);
 
-    Function(std::string name = "");
+    Function(std::string name = "", size_t poliz_pos = -1);
 
     const std::string& return_type() const;
 
     const std::string& name() const;
+
+    size_t poliz_pos() const;
+    void set_poliz_pos(const size_t& new_pos);
 
     std::vector<Value>& argument_list();
 };
@@ -88,6 +100,9 @@ class FunctionTIDS {
 
     void push_func_return_type(const std::string& func_name,
                                const std::string& return_type);
+
+    void push_func_poliz_pos(const std::string& func_name,
+                             const std::size_t& pos);
 
     void check_param_count(const std::string& func_name,
                            const int& have_params);
@@ -127,6 +142,10 @@ class StructTIDS {
     void push_func_return_type(const std::string& struct_name,
                                const std::string& func_name,
                                const std::string& return_type);
+
+    void push_func_poliz_pos(const std::string& struct_name,
+                             const std::string& func_name,
+                             const std::size_t& pos);
 
     void check_param_count(const std::string& struct_name,
                            const std::string& func_name,
