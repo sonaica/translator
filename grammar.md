@@ -87,9 +87,11 @@
 
 <Assignment> ::= = | <<= | >>= | += | -= | *= | **= | /= | //= | ^= | &= | |= | %=м
 
-<ArrayFuncMember term> ::= <Arithmetic term>(<ArrayAccess>|<FunctionCall>|<MemberAccess><ArrayFuncMember term>)
+<ArrayFunc term> ::= <Arithmetic term>(<ArrayAccess>|<FunctionCall>)
 
-<Unary term> ::= <Unary><ArrayFuncMember term> | <ArrayFuncMember term>
+<Member term> ::= <ArrayFunc term>{<MemberAccess><ArrayFunc term>}
+
+<Unary term> ::= <Unary><Unary term> | <Member term>
 
 <Mul term> ::= <Unary term>{<Mul><Unary term>}
 
