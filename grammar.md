@@ -11,16 +11,11 @@
 <Function definition> ::= fun <Name> <Function parameters> (<Type>|<Name>)  ‘{‘ <Operator> return <Expression>‘}’
 
 <Function parameters> ::= "(" (<Name>|<Type>) <Name> {, (<Name>|<Type>) <Name> } ")"
-
-<Function call> ::= <Name><Argument list>
-
-<Argument list> ::= "("<Expression> {, <Expression> }")"
 ```
 ### Structures
 ```
 <Struct definition> ::= struct <Name>  ‘{‘ { <Function definition> | <Variable creation> } ‘}’ <Name> {, <Name>};
 
-<Struct member> ::= <Name>.(<Name>|<Function call>)
 ```
 ### Types and variables
 ```
@@ -64,6 +59,12 @@
 ```
 <Arithmetic logic expression> ::= <Assignment term>
 
+<FunctionCall> ::= (<Expression>) | ()
+
+<ArrayAccess> ::= [<ExpressionTerm>]
+
+<MemberAccess> ::= .
+
 <Unary> ::= + | - | ++ | -- | ~
 
 <Mul> ::= * | / | %
@@ -84,13 +85,13 @@
 
 <NonEquality> ::= > | < | >= | <=
 
-<Assignment> ::= = | <<= | >>= | += | -= | *= | **= | /= | //= | ^= | &= | |= | %=
+<Assignment> ::= = | <<= | >>= | += | -= | *= | **= | /= | //= | ^= | &= | |= | %=м
 
-<Unary term> ::= <Unary><Unary term> | <Arithmetic term>
+<ArrayFuncMember term> ::= <Arithmetic term>(<ArrayAccess>|<FunctionCall>|<MemberAccess><ArrayFuncMember term>)
 
-<Power term> ::= <Unary term>{<Power><Unary term>}
+<Unary term> ::= <Unary><ArrayFuncMember term> | <ArrayFuncMember term>
 
-<Mul term> ::= <Power term>{<Mul><Power term>}
+<Mul term> ::= <Unary term>{<Mul><Unary term>}
 
 <Sum term> ::= <Mul term>{<Sum><Mul term>}
 
@@ -108,7 +109,9 @@
 
 <Assignment term> ::= <Or term>{<Assignment><Or term>}
 
-<Arithmetic term> ::= <Boolean literal> | <Arithmetic literal> | <Variable> | "("<Arithmetic logic expression>")" | <Struct member> | <Function call>
+<Arithmetic term> ::= <Boolean literal> | <Arithmetic literal> | "("<Arithmetic logic expression>")" | <Identifier>
+
+<Identifier> ::= <Name>
 
 <Arithmetic literal> ::= <Signed number> | <Signed number>.<Unsigned number>
 
@@ -150,6 +153,6 @@
 ```
 ### Match
 ```
-<Match> ::= match <Name> ‘{‘ {<Expression> => <Operator>} ‘}’
+<Match> ::= match <Name> ‘{‘ {<Literal> => <Operator>} ‘}’
 ```
 
