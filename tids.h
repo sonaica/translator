@@ -43,7 +43,7 @@ class IdentifierTIDS {
 
         std::string check_id(const std::string& VariableName);
 
-        cool_byte* find_id(const std::string& VariableName);
+        cool_byte*& find_id(const std::string& VariableName);
     };
 
     IdentifierTIDS();
@@ -109,6 +109,8 @@ class FunctionTIDS {
 
     void check_exist_id(const std::string& func_name);
 
+    Function& getFunction(const std::string& func_name);
+
    private:
     StringSet<Function> name_set;
 };
@@ -118,6 +120,8 @@ class StructTIDS {
     StructTIDS();
 
     void push_id(const std::string& struct_name, const Value& name);
+
+    bool check_struct_existance(const std::string& struct_name);
 
     std::string check_id(const std::string& struct_name,
                          const std::string& name);

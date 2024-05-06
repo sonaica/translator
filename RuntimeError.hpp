@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 
 class RuntimeError {
@@ -44,13 +45,6 @@ class InvalidOutputOperandError: public RuntimeError {
     InvalidOutputOperandError();
 
     virtual ~InvalidOutputOperandError();
-};
-
-class AssignmentToRvalueError: public RuntimeError {
-  public:
-    AssignmentToRvalueError();
-
-    virtual ~AssignmentToRvalueError();
 };
 
 class CrementOnBoolError: public RuntimeError {

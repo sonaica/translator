@@ -8,7 +8,8 @@ using std::string;
 using std::map;
 
 map<string, int> priority = {
-    {"++", 1}, {"--", 1}, {"-u", 1}, {"+u", 1}, {"~", 1}, {"()", 1}, {"[]", 1}, {".", 1},
+    {"[]", 0}, {".", 0},
+    {"++", 1}, {"--", 1}, {"-u", 1}, {"+u", 1}, {"~", 1},
     {"**", 2},
     {"*", 3}, {"/", 3}, {"%", 3},
     {"+", 4}, {"-", 4},
@@ -27,7 +28,7 @@ map<string, int> priority = {
 
 vector<string> associativity[2] = {
     {"&=", "**", "**=", "*=", "++", "+=", "+u", "--", "-=", "-u", "//=", "/=", "<<=", "=", ">>=", "^=", "input", "output", "|=", "~"},
-    {"!=", "%", "&", "()", "*", "+", "-", ".", "/", "<", "<<", "<=", "==", ">", ">=", ">>", "[]", "^", "and", "or", "|"}
+    {"!=", "%", "&", "*", "+", "-", ".", "/", "<", "<<", "<=", "==", ">", ">=", ">>", "[]", "^", "and", "or", "|"}
 };
 
 enum ELEMENT_TYPE {
@@ -43,9 +44,7 @@ enum ELEMENT_TYPE {
     POSITION,
     SEPARATOR,
     REM_MATCH_MAIN_TERM,
-    REM_MATCH_CASE,
     GET_MATCH_MAIN_TERM,
-    GET_CASE_TERM,
     MAKE_VARIABLE,
     MAKE_ARRAY_EXACT,
     MAKE_ARRAY_AUTO,
@@ -53,7 +52,10 @@ enum ELEMENT_TYPE {
     END_OF_FUNCTION,
     VARIABLE_OPERAND,
     CREATE_TID,
-    DELETE_TID
+    DELETE_TID,
+    CLEAR_STACK,
+    STOP_CLEARING_STACK,
+    STRUCT_MEMBER
 };
 
 std::map<ELEMENT_TYPE, std::string> element_type_translation = {
@@ -69,17 +71,17 @@ std::map<ELEMENT_TYPE, std::string> element_type_translation = {
     {ELEMENT_TYPE::POSITION, "POSITION"},
     {ELEMENT_TYPE::SEPARATOR, "SEPARATOR"},
     {ELEMENT_TYPE::REM_MATCH_MAIN_TERM, "REMEMBER_MAIN_TERM_OF_MATCH"},
-    {ELEMENT_TYPE::REM_MATCH_CASE, "REMEMBER_MATCH_CASE_TERM"},
     {ELEMENT_TYPE::GET_MATCH_MAIN_TERM, "GET_MATCH_MAIN_TERM"},
-    {ELEMENT_TYPE::GET_CASE_TERM, "GET_CASE_TERM"},
     {ELEMENT_TYPE::MAKE_VARIABLE, "MAKE_VARIABLE"},
     {ELEMENT_TYPE::MAKE_ARRAY_EXACT, "MAKE_ARRAY_EXACT"},
     {ELEMENT_TYPE::MAKE_ARRAY_AUTO, "MAKE_ARRAY_AUTO"},
     {ELEMENT_TYPE::RETURN_OPERATOR, "RETURN_OPERATOR"},
     {ELEMENT_TYPE::END_OF_FUNCTION, "END_OF_FUNCTION"},
-    {ELEMENT_TYPE::VARIABLE_OPERAND, "ADD_VARAIBLE_OPERAND"},
+    {ELEMENT_TYPE::VARIABLE_OPERAND, "VARIABLE_OPERAND"},
     {ELEMENT_TYPE::CREATE_TID, "CREATE_NEW_TID"},
-    {ELEMENT_TYPE::DELETE_TID, "DELETE_CURRENT_TID"}
+    {ELEMENT_TYPE::DELETE_TID, "DELETE_CURRENT_TID"},
+    {ELEMENT_TYPE::CLEAR_STACK, "CLEAR_STACK"},
+    {ELEMENT_TYPE::STRUCT_MEMBER, "STRUCT_MEMBER"}
 };
 
 enum ASSOCIATIVITY_TYPE {

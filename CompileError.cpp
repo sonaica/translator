@@ -1,8 +1,8 @@
 #pragma once
 #include "CompileError.h"
 
-CompileError::CompileError(const std::string& ErrorText)
-    : ErrorText_(ErrorText){};
+CompileError::CompileError(std::string ErrorText)
+    : ErrorText_(ErrorText){}
 
 CompileError::~CompileError() = default;
 
@@ -248,3 +248,26 @@ TooFewParameters::~TooFewParameters() = default;
 
 InvalidTypes::InvalidTypes() : CompileError("Compile time error: invalid types"){};
 InvalidTypes::~InvalidTypes() = default;
+
+InvalidFunctionCall::InvalidFunctionCall() : CompileError("Compile time error: invalid function call") {}
+InvalidFunctionCall::~InvalidFunctionCall() = default;
+
+CrementedRvalue::CrementedRvalue() : CompileError("Compile time error: can't ++ or -- an rvalue object") {}
+CrementedRvalue::~CrementedRvalue() = default;
+
+InvalidCrementOperand::InvalidCrementOperand() : CompileError("Compile time error: can't __crement anything, but \"double\" and \"int\"") {}
+InvalidCrementOperand::~InvalidCrementOperand() = default;
+
+InvalidUnaryOperand::InvalidUnaryOperand() : CompileError("Compile time error: can't do unary operation with custom types") {}
+InvalidUnaryOperand::~InvalidUnaryOperand() = default;
+
+InvalidBinaryNotOperand::InvalidBinaryNotOperand() : CompileError("Compile time error: can't do \"~\" to anything, but \"int\" and \"bool\"") {}
+InvalidBinaryNotOperand::~InvalidBinaryNotOperand() = default;
+
+AssignmentOfNonBasicTypes::AssignmentOfNonBasicTypes() : CompileError("Compile time error: can't do assignment with non basic types") {}
+AssignmentOfNonBasicTypes::~AssignmentOfNonBasicTypes() = default;
+
+AssignmentToRvalueError::AssignmentToRvalueError()
+    : CompileError("Compile time error: can't assign value to an rvalue") {}
+
+AssignmentToRvalueError::~AssignmentToRvalueError() = default;

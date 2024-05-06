@@ -71,6 +71,8 @@
 
 <Sum> ::= + | -
 
+<Power> ::= **
+
 <And> ::= & | and
 
 <Xor> ::= ^
@@ -83,7 +85,7 @@
 
 <NonEquality> ::= > | < | >= | <=
 
-<Assignment> ::= = | <<= | >>= | += | -= | *= | **= | /= | ^= | &= | |= | %=
+<Assignment> ::= = | <<= | >>= | += | -= | *= | **= | /= | //= | ^= | &= | |= | %=м
 
 <ArrayFunc term> ::= <Arithmetic term>(<ArrayAccess>|<FunctionCall>)
 

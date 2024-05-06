@@ -15,5 +15,11 @@ fun f4(double x) double {
 }
 
 main() {
-    
+    int a;
+    match (x) {
+        1 => {output 1;}
+        2 => {output 2;}
+        3 => {output 3;}
+        4 => {output 4;}
+    }
 }

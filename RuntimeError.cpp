@@ -1,3 +1,4 @@
+#pragma once
 #include "RuntimeError.hpp"
 
 void RuntimeError::what() { std::cerr << ErrorText_; }
@@ -30,11 +31,6 @@ InvalidOutputOperandError::InvalidOutputOperandError()
     : RuntimeError("Runtime error: can't output this item") {}
 
 InvalidOutputOperandError::~InvalidOutputOperandError() = default;
-
-AssignmentToRvalueError::AssignmentToRvalueError()
-    : RuntimeError("Runtime error: can't assign value to an rvalue") {}
-
-AssignmentToRvalueError::~AssignmentToRvalueError() = default;
 
 CrementOnBoolError::CrementOnBoolError()
     : RuntimeError("Runtime error : can't increment or decrement a boolean value") {}
