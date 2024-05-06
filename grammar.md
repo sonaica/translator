@@ -83,7 +83,7 @@
 
 <NonEquality> ::= > | < | >= | <=
 
-<Assignment> ::= = | <<= | >>= | += | -= | *= | **= | /= | //= | ^= | &= | |= | %=м
+<Assignment> ::= = | <<= | >>= | += | -= | *= | /= | //= | ^= | &= | |= | %=
 
 <ArrayFunc term> ::= <Arithmetic term>(<ArrayAccess>|<FunctionCall>)
 
