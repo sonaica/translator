@@ -5,7 +5,7 @@
 class CompileError {
    public:
     void what();
-    CompileError(const std::string& ErrorText);
+    CompileError(std::string);
 
     virtual ~CompileError();
 
@@ -272,4 +272,53 @@ class InvalidTypes : public CompileError{
    public:
     InvalidTypes();
     virtual ~InvalidTypes();
+};
+
+class InvalidFunctionCall : public CompileError {
+  public:
+    InvalidFunctionCall();
+
+    virtual ~InvalidFunctionCall();
+};
+
+class CrementedRvalue : public CompileError {
+  public:
+    CrementedRvalue();
+
+    virtual ~CrementedRvalue();
+};
+
+class InvalidCrementOperand : public CompileError {
+  public:
+    InvalidCrementOperand();
+
+    virtual ~InvalidCrementOperand();
+};
+
+class InvalidUnaryOperand : public CompileError {
+  public:
+    InvalidUnaryOperand();
+
+    virtual ~InvalidUnaryOperand();
+};
+
+class InvalidBinaryNotOperand : public CompileError {
+  public:
+    InvalidBinaryNotOperand();
+
+    virtual ~InvalidBinaryNotOperand();
+};
+
+class AssignmentOfNonBasicTypes : public CompileError {
+  public:
+    AssignmentOfNonBasicTypes();
+
+    virtual ~AssignmentOfNonBasicTypes();
+};
+
+class AssignmentToRvalueError: public CompileError {
+  public:
+    AssignmentToRvalueError();
+
+    virtual ~AssignmentToRvalueError();
 };

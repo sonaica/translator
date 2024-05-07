@@ -71,6 +71,8 @@
 
 <Sum> ::= + | -
 
+<Power> ::= **
+
 <And> ::= & | and
 
 <Xor> ::= ^
@@ -83,13 +85,11 @@
 
 <NonEquality> ::= > | < | >= | <=
 
-<Assignment> ::= = | <<= | >>= | += | -= | *= | **= | /= | ^= | &= | |= | %=
+<Assignment> ::= = | <<= | >>= | += | -= | *= | **= | /= | //= | ^= | &= | |= | %=м
 
-<ArrayFunc term> ::= <Arithmetic term>(<ArrayAccess>|<FunctionCall>)
+<ArrayFuncMember term> ::= <Arithmetic term>{(<MemberAccess><Arithmetic term>)|<ArrayAccess>|<FunctionCall>}
 
-<Member term> ::= <ArrayFunc term>{<MemberAccess><ArrayFunc term>}
-
-<Unary term> ::= <Unary><Unary term> | <Member term>
+<Unary term> ::= <Unary><Unary term> | <ArrayFuncMember term>
 
 <Mul term> ::= <Unary term>{<Mul><Unary term>}
 

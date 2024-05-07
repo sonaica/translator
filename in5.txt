@@ -1,0 +1,25 @@
+fun f1(double x) double {
+    return x * x * x;
+}
+
+fun f2(double x) double {
+    return 2 * x;
+}
+
+fun f3(double x) double {
+    return x * x;
+}
+
+fun f4(double x) double {
+    return x + 1;
+}
+
+main() {
+    int a;
+    match (x) {
+        1 => {output 1;}
+        2 => {output 2;}
+        3 => {output 3;}
+        4 => {output 4;}
+    }
+}

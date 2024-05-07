@@ -1,3 +1,8 @@
-main() {
+struct str {
+    int a;
+} b;
 
+main() {
+    input b.a;
+    output b.a;
 }

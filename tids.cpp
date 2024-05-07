@@ -5,6 +5,8 @@
 
 // struct Value
 
+
+
 Value::Value() : type_(""), name_("") {}
 
 Value::Value(const std::string& type, const std::string& name)
@@ -18,7 +20,15 @@ bool Value::operator==(const Value& other) const {
     return other.type() == type() && other.name() == name();
 }
 
-bool duplicates(const Value& first, const Value& second) {
+size_t get_type_size(const std::string &str, StructTIDS& StrTIDS)
+{
+    if (str == "int" || str == "double" || str == "bool")
+        return 1;
+    return StrTIDS.get_struct_size(str);
+}
+
+bool duplicates(const Value &first, const Value &second)
+{
     return first.name() == second.name();
 }
 
@@ -31,12 +41,24 @@ IdentifierTIDS::element::~element() {
 IdentifierTIDS::element::element(element *parent)
     : parent_(parent), variables_({}) {}
 
-void IdentifierTIDS::element::push_id(const Value& Value) {
+void IdentifierTIDS::element::push_id(const Value& Value, StructTIDS& StrTIDS) {
     if (name_set.find(Value.name_).first)
         throw IdentifierAlreadyDefined(Value.name());
     variables_.push_back(Value);
     name_set.insert(Value.name_, Value.type_);
-    adr_name_set.insert(Value.name_, new cool_byte);
+    size_t added_size = get_type_size(Value.type(), StrTIDS);
+    adr_name_set.insert(Value.name_, new cool_byte[added_size]);
+    block_size += added_size;
+}
+
+bool IdentifierTIDS::element::check_id_safe(const std::string &VariableName)
+{
+    std::pair<bool, std::string&> find_result = name_set.find(VariableName);
+    if (!find_result.first) {
+        if (parent_ == nullptr) return false;
+        return parent_->check_id_safe(VariableName);
+    }
+    return true;
 }
 
 std::string IdentifierTIDS::element::check_id(const std::string& VariableName) {
@@ -48,7 +70,7 @@ std::string IdentifierTIDS::element::check_id(const std::string& VariableName) {
     return find_result.second;
 }
 
-cool_byte* IdentifierTIDS::element::find_id(const std::string &VariableName)
+cool_byte*& IdentifierTIDS::element::find_id(const std::string &VariableName)
 {
     std::pair<bool, cool_byte*&> find_result = adr_name_set.find(VariableName);
     if (!find_result.first) {
@@ -56,6 +78,21 @@ cool_byte* IdentifierTIDS::element::find_id(const std::string &VariableName)
         return parent_->find_id(VariableName);
     }
     return find_result.second;
+}
+
+size_t IdentifierTIDS::element::get_pointer_jump(const std::string &VariableName, StructTIDS& StrTIDS)
+{
+    if (!name_set.find(VariableName).first) {
+        if (parent_ != nullptr) return parent_->get_pointer_jump(VariableName, StrTIDS);
+        throw UndefinedVariable(VariableName);
+    }
+    size_t pointer_jump = 0;
+    for (auto& v : variables_) {
+        if (v.name() != VariableName) {
+            pointer_jump += get_type_size(v.type(), StrTIDS);
+        }
+    }
+    return pointer_jump;
 }
 
 IdentifierTIDS::IdentifierTIDS()
@@ -110,6 +147,11 @@ void FunctionTIDS::push_func_id(const std::string& func_name) {
     name_set.insert(func_name, Function(func_name));
 }
 
+bool FunctionTIDS::check_func_id_safe(const std::string &func_name)
+{
+    return name_set.find(func_name).first;
+}
+
 std::string FunctionTIDS::check_func_id(const std::string& func_name) {
     std::pair<bool, Function&> find_result = name_set.find(func_name);
     if (!find_result.first) throw UndefinedFunction(func_name);
@@ -145,6 +187,11 @@ void FunctionTIDS::check_exist_id(const std::string& name) {
     return;
 }
 
+Function &FunctionTIDS::getFunction(const std::string &name)
+{
+    return name_set.find(name).second;
+}
+
 void FunctionTIDS::check_func_par(const std::string& func_name, int par_num,
                                   const std::string& type) {
     std::pair<bool, Function&> find_result = name_set.find(func_name);
@@ -178,7 +225,12 @@ void StructTIDS::push_id(const std::string& struct_name,
     std::pair<bool, std::pair<FunctionTIDS, IdentifierTIDS>&> find_res =
         name_set.find(struct_name);
     if (!find_res.first) throw UndefinedStruct(struct_name);
-    find_res.second.second.cur_tid()->push_id(variable);
+    find_res.second.second.cur_tid()->push_id(variable, *this);
+}
+
+bool StructTIDS::check_struct_existance(const std::string &struct_name)
+{
+    return name_set.find(struct_name).first;
 }
 
 std::string StructTIDS::check_id(const std::string& struct_name,
@@ -261,6 +313,40 @@ void StructTIDS::check_param_count(const std::string& struct_name,
         name_set.find(struct_name);
     if (!find_res.first) throw UndefinedStruct(struct_name);
     find_res.second.first.check_param_count(func_name, have_params);
+}
+
+bool StructTIDS::check_id_safe(const std::string &struct_name, const std::string &variable_name)
+{
+    return name_set.find(struct_name).second.second.cur_tid()->check_id_safe(variable_name);
+}
+
+bool StructTIDS::check_func_id_safe(const std::string &struct_name, const std::string &func_name)
+{
+    return name_set.find(struct_name).second.first.check_func_id_safe(func_name);
+}
+
+size_t StructTIDS::get_pointer_jump(const std::string &struct_name, const std::string &member_name)
+{
+    std::pair<bool, std::pair<FunctionTIDS, IdentifierTIDS>&> find_res =
+        name_set.find(struct_name);
+    if (!find_res.first) throw UndefinedStruct(struct_name);
+    return find_res.second.second.cur_tid()->get_pointer_jump(member_name, *this);
+}
+
+size_t StructTIDS::get_func_poliz(const std::string &struct_name, const std::string &func_name)
+{
+    std::pair<bool, std::pair<FunctionTIDS, IdentifierTIDS>&> find_res =
+        name_set.find(struct_name);
+    if (!find_res.first) throw UndefinedStruct(struct_name);
+    return find_res.second.first.getFunction(func_name).poliz_pos();
+}
+
+size_t StructTIDS::get_struct_size(const std::string &struct_name)
+{
+    std::pair<bool, std::pair<FunctionTIDS, IdentifierTIDS>&> find_res =
+        name_set.find(struct_name);
+    if (!find_res.first) throw UndefinedStruct(struct_name);
+    return find_res.second.second.cur_tid()->block_size;
 }
 
 void Value::set_name(const std::string& name) { name_ = name; }

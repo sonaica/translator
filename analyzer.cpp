@@ -15,9 +15,22 @@ std::vector<char> text;
 Lexem lexem;
 bool new_line, new_line_prev;
 
-int main() {
+void print_poliz() {
+    for (size_t ind = 0; ind < poliz.size(); ++ind) {
+        std::cout << ind << ": ";
+        std::cout << element_type_translation[poliz[ind].type_info] << " -> ";
+        if (poliz[ind].type_info == ELEMENT_TYPE::POSITION)
+            std::cout << poliz[ind].position << "\n";
+        else
+            std::cout << poliz[ind].maker << "\n";
+    }
+}
+
+int main(int argc, char* argv[]) {
     using std::cout;
     // std::cout << "Enter the name of file: ";
+    std::cout.precision(10);
+    std::cout << std::fixed;
     std::string file_in = "in_cur.txt", file_out = "out.txt";
     const std::string file_keywords = "keywords.txt";
     CreateBor(file_keywords);
@@ -25,8 +38,10 @@ int main() {
     try {
         GetLexem();
         size_t start = Program();
+
         try {
-            Run(start, "main");
+            if (argv[1][0] - '0' == 0) print_poliz();
+            else Run(start, "main");
         } catch (RuntimeError& e) {
             e.what();
             return 1;
@@ -38,5 +53,5 @@ int main() {
         cout << '\n';
         return 1;
     }
-    std::cout << "OK\n";
+    std::cout << "\nOK\n";
 }
