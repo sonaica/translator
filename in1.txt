@@ -1,43 +1,22 @@
-import "pretty_cool_file.h";
-import "C\triple\downtown_funk.cpp";
-define make_pair mp;
-
-double N = 100000;
-int n;
-int p[n];
-
-fun max(double a, double b) int {
-    if (a < b) {
-        return b;
+fun div(int n, int m) int {
+    int i = 2;
+    int cnt = 0;
+    while (i * i <= n){
+        if (n % i == 0) {
+            output i, " ";
+            cnt += 1;
+            if (cnt == m) {
+                return cnt;
+            }
+        }
+        ++i;
     }
-    return a;
+    return m;
 }
 
-struct my_struct{
-    int a, b;
-    fun sum(int c, int d) int {
-        return c + d;
-    }
-} str, jui;
 
-main() {
+main(){
+    int n;
     input n;
-    //int k;
-    for (int i = 0; i < n; i)
-        input p[i];
-        
-    int value = -1000000000;
-    for (int i = 0; i < 5; ++i) {
-        //value = max(value, p[i]) = 9.0;
-        int k;
-        k = 6;
-    }
-    //k = 5;
-    if (N) {
-        //N = n + str;
-        double a, b, c;
-        //a = b & c;
-        max(a, N);
-    }
-    output value;
+    div(n, div(256, 3));
 }

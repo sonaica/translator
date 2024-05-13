@@ -1,3 +1,4 @@
+#pragma once
 #include "poliz.hpp"
 
 poliz_element::poliz_element(ELEMENT_TYPE new_type) : type_info(new_type) {}
@@ -85,6 +86,10 @@ void push_stack(poliz_element new_element)
             break;
         }
         case OPERATOR: {
+            if (new_element.maker == ";") {
+                poliz_stack.push_back(new_element);
+                break;
+            }
             if (get_associativity(new_element.maker) == ASSOCIATIVITY_TYPE::LEFT) {
                 while (poliz_stack.size() && poliz_stack.back().type_info == ELEMENT_TYPE::OPERATOR
                         && priority[poliz_stack.back().maker] <= priority[new_element.maker]) {
@@ -130,15 +135,7 @@ void push_stack(poliz_element new_element)
             push_poliz(new_element);
             break;
         }
-        case REM_MATCH_CASE: {
-            push_poliz(new_element);
-            break;
-        }
         case REM_MATCH_MAIN_TERM: {
-            push_poliz(new_element);
-            break;
-        }
-        case GET_CASE_TERM: {
             push_poliz(new_element);
             break;
         }
@@ -151,6 +148,18 @@ void push_stack(poliz_element new_element)
             break;
         }
         case MAKE_ARRAY_EXACT: {
+            push_poliz(new_element);
+            break;
+        }
+        case CLEAR_STACK: {
+            push_poliz(new_element);
+            break;
+        }
+        case UNDEFINED: {
+            push_poliz(new_element);
+            break;
+        }
+        case STRUCT_MEMBER: {
             push_poliz(new_element);
             break;
         }

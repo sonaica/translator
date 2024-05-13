@@ -7,12 +7,18 @@ template<class T>
 StringSet<T>::Vertex::Vertex(T value)
 {
     std::memset(move_to, -1, sizeof(move_to));
-    terminal = true;
+    terminal = false;
     extra_value = value;
 }
 
 template<class T>
 void StringSet<T>::Vertex::terminate() { terminal = true; }
+
+template <class T>
+bool StringSet<T>::Vertex::is_terminal() const
+{
+    return terminal;
+}
 
 template<class T>
 StringSet<T>::StringSet() {

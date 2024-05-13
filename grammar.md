@@ -71,6 +71,8 @@
 
 <Sum> ::= + | -
 
+<Power> ::= **
+
 <And> ::= & | and
 
 <Xor> ::= ^
@@ -83,13 +85,11 @@
 
 <NonEquality> ::= > | < | >= | <=
 
-<Assignment> ::= = | <<= | >>= | += | -= | *= | **= | /= | ^= | &= | |= | %=
+<Assignment> ::= = | <<= | >>= | += | -= | *= | **= | /= | //= | ^= | &= | |= | %=м
 
-<ArrayFunc term> ::= <Arithmetic term>(<ArrayAccess>|<FunctionCall>)
+<ArrayFuncMember term> ::= <Arithmetic term>{(<MemberAccess><Arithmetic term>)|<ArrayAccess>|<FunctionCall>}
 
-<Member term> ::= <ArrayFunc term>{<MemberAccess><ArrayFunc term>}
-
-<Unary term> ::= <Unary><Unary term> | <Member term>
+<Unary term> ::= <Unary><Unary term> | <ArrayFuncMember term>
 
 <Mul term> ::= <Unary term>{<Mul><Unary term>}
 
@@ -127,7 +127,7 @@
 ```
 ### Cycles
 ```
-<For>::= for "("<Variable Initialization>; <Expression>; <Expression>")" <Operator>
+<For>::= for "("(<Variable Initialization>); <Expression>; <Expression>")" <Operator>
 
 <While>::= while "(" <Expression> ")" <Operator>
 ```
@@ -143,9 +143,9 @@
 ```
 <Array declaration>::= <Array declaration exact> | <Array declaration auto>
 
-<Array declaration exact> ::= <Type> <Name>”[“<Expression>”]” [ = “{“ <Literal> {, <Literal>} "}"];
+<Array declaration exact> ::= <Type> <Name>”[“<Expression>”]” [ = “{“ <Expression> "}"];
 
-<Array declaration auto> ::= <Type> <Name> “[]” = “{“ <Literal> {, <Literal> } "}";
+<Array declaration auto> ::= <Type> <Name> “[]” = “{“ <Expression> "}";
 
 <Array indexation> ::= <Name>"["<Expression>"]"
 

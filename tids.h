@@ -5,10 +5,13 @@
 
 #include "StringSet.cpp"
 
+class StructTIDS;
+class IdentifierTIDS;
+class FunctionTIDS;
+
 struct Value {
     std::string type_;
     std::string name_;
-    uni_ptr ptr;
 
     Value();
 
@@ -24,6 +27,8 @@ struct Value {
     bool operator==(const Value& other) const;
 };
 
+size_t get_type_size(const std::string& str, StructTIDS& StrTIDS);
+
 bool duplicates(Value& first, Value& second);
 
 class IdentifierTIDS {
@@ -31,6 +36,7 @@ class IdentifierTIDS {
     struct element {
         StringSet<std::string> name_set;
         StringSet<cool_byte*> adr_name_set;
+        size_t block_size = 0;
 
         element* parent_;
         std::vector<Value> variables_;
@@ -39,11 +45,17 @@ class IdentifierTIDS {
 
         element(element* parent = nullptr);
 
-        void push_id(const Value& Variable);
+        void push_id(const Value& Variable, StructTIDS& StrTIDS, int cnt = 1);
+
+        bool check_id_safe(const std::string& VariableName);
 
         std::string check_id(const std::string& VariableName);
 
-        cool_byte* find_id(const std::string& VariableName);
+        cool_byte*& find_id(const std::string& VariableName);
+
+        size_t get_pointer_jump(const std::string& VariableName, StructTIDS& StrTIDS);
+
+        void __output_elem() const;
     };
 
     IdentifierTIDS();
@@ -55,6 +67,8 @@ class IdentifierTIDS {
     void del_TID();
     
     bool is_empty() const;
+
+    void __output_TID() const;
 
    private:
     element* cur_tid_;
@@ -81,6 +95,10 @@ struct Function {
     void set_poliz_pos(const size_t& new_pos);
 
     std::vector<Value>& argument_list();
+
+    void check_func_par(int par_num, const std::string& type);
+
+    void check_param_count(const int& have_params);
 };
 
 bool duplicates(Function& F1, Function F2);
@@ -90,6 +108,8 @@ class FunctionTIDS {
     FunctionTIDS();
 
     void push_func_id(const std::string& func_name);
+
+    bool check_func_id_safe(const std::string& func_name);
 
     std::string check_func_id(const std::string& func_name);
 
@@ -109,6 +129,8 @@ class FunctionTIDS {
 
     void check_exist_id(const std::string& func_name);
 
+    Function* getFunction(const std::string& func_name);
+
    private:
     StringSet<Function> name_set;
 };
@@ -118,6 +140,8 @@ class StructTIDS {
     StructTIDS();
 
     void push_id(const std::string& struct_name, const Value& name);
+
+    bool check_struct_existance(const std::string& struct_name);
 
     std::string check_id(const std::string& struct_name,
                          const std::string& name);
@@ -150,6 +174,23 @@ class StructTIDS {
     void check_param_count(const std::string& struct_name,
                            const std::string& func_name,
                            const int& have_params);
+
+    bool check_id_safe(const std::string& struct_name,
+                       const std::string& variable_name);
+
+    bool check_func_id_safe(const std::string& struct_name,
+                            const std::string& func_name);
+
+    size_t get_pointer_jump(const std::string& struct_name,
+                            const std::string& member_name);
+
+    size_t get_func_poliz(const std::string& struct_name,
+                          const std::string& func_name);
+
+    size_t get_struct_size(const std::string& struct_name);
+
+    Function* getFunction(const std::string& struct_name,
+                         const std::string& func_name);
 
    private:
     StringSet<std::pair<FunctionTIDS, IdentifierTIDS>> name_set;

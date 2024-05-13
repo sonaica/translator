@@ -29,13 +29,10 @@ void Directive();
 
 void FunctionDefinition(std::string str = NOT_A_STRUCT);
 void FunctionParameters(std::string str = NOT_A_STRUCT);
-void FunctionCall(std::string str = NOT_A_STRUCT);
-void ArgumentList(std::string str = NOT_A_STRUCT, std::string name_of_func = "");
 
 // Structures
 
 void StructDefinition();
-void StructMember();
 
 // Types and variables
 
@@ -48,28 +45,31 @@ bool SpecialSymbol(char c);
 bool Digit(char c);
 std::string Type();
 void EntityCreation(std::string str = NOT_A_STRUCT, std::string type = "");
-void VariableCreation(std::string str = NOT_A_STRUCT, std::string type = "");
+bool VariableCreation(std::string str = NOT_A_STRUCT);
 
 // void VariableDefinition();
 //
 // void VariableInitialization();
 
-bool Sign();
-bool SignedNumber();
-bool UnsignedNumber();
+// bool Sign();
+// bool SignedNumber();
+// bool UnsignedNumber();
 
 // Expression
 
-void Expression();
-void ExpressionTerm();
+void Expression(bool need_to_check_left = true);
+void ExpressionTerm(bool need_to_check_left = true);
 
 // Arithmetic, logic, comparison and assignment
 
 void ArithmeticExpression();
+void UnclearedOperands();
+bool FunctionCall();
+bool ArrayAccess();
+bool MemberAccess();
 bool Unary();
 bool Mul();
 bool Sum();
-bool Power();
 bool And();
 bool Xor();
 bool Or();
@@ -77,8 +77,8 @@ bool Shift();
 bool Equality();
 bool NonEquality();
 bool Assignment();
+void ArrayFuncMemberTerm();
 void UnaryTerm();
-void PowerTerm();
 void MulTerm();
 void SumTerm();
 void ShiftTerm();
@@ -113,10 +113,9 @@ void OutputItem();
 
 // Arrays
 
-void ArrayIndexation();
-void ArrayDeclaration();
-void ArrayDeclarationAuto();
-void ArrayDeclarationExact();
+void ArrayDeclaration(const std::string& str);
+void ArrayDeclarationAuto(const std::string& str);
+void ArrayDeclarationExact(const std::string& str);
 void Literal();
 
 // Match

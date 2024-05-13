@@ -171,17 +171,18 @@ Verdict FSM() {
                 if (is_letter(cur) || is_digit(cur)) {
                     current_lexem += cur;
                     ++pos;
-                } else if (cur == '.') {
-                    if (!point) {
-                        current_lexem += cur;
-                        ++pos;
-                        point = true;
-                    } else {
-                        verdict_return.is_error = true;
-                        verdict_return.type = 3;
-                        return verdict_return;
-                    }
-                } else {
+                } //else if (cur == '.') {
+                    // if (!point) {
+                    //     current_lexem += cur;
+                    //     ++pos;
+                    //     point = true;
+                    // } else {
+                    //     verdict_return.is_error = true;
+                    //     verdict_return.type = 3;
+                    //     return verdict_return;
+                    // }
+                //} 
+                else {
                     if (is_keyword(current_lexem)) {
                         if (current_lexem == "true" ||
                             current_lexem == "false") {

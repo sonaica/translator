@@ -1,0 +1,22 @@
+fun sum(int a, int b) int {
+    return a + b;
+}
+
+struct Point {
+    int x;
+    int y;
+
+    fun print() void {
+        output "x: ", x, ", y: ", y;
+    }
+};
+
+main() {
+    Point p;
+    p.x = 10;
+    p.y = 20;
+    p.print();
+
+    int s = sum(p.x, p.y);
+    output "Sum: ", s;
+}

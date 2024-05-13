@@ -16,6 +16,8 @@ class StringSet {
         Vertex(T value = T());
 
         void terminate();
+
+        bool is_terminal() const;
     };
 
     std::vector<Vertex> vertex_list;

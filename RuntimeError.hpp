@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 
 class RuntimeError {
@@ -46,16 +47,9 @@ class InvalidOutputOperandError: public RuntimeError {
     virtual ~InvalidOutputOperandError();
 };
 
-class AssignmentToRvalueError: public RuntimeError {
+class TooManyElementsForArray: public RuntimeError {
   public:
-    AssignmentToRvalueError();
+    TooManyElementsForArray(const std::string& arr_name);
 
-    virtual ~AssignmentToRvalueError();
-};
-
-class CrementOnBoolError: public RuntimeError {
-  public:
-    CrementOnBoolError();
-
-    virtual ~CrementOnBoolError();
+    virtual ~TooManyElementsForArray();
 };

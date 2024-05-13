@@ -1,28 +1,21 @@
-import "libs_from_tourist.cppp";
-import "not_a_bad_library.cpp";
-
-define undefineable ez;
-define how_to_obz noooo;
-
-int N = 100000;
-int mod = 1000000000 + 7;
-
-fun add(int a, int b) int {
-    if (a + b < mod) {
-        return a + b;
-    }
-    return a + b - mod;
+fun sum(int a, int b, int c) int {
+    return a + b + c;
 }
 
-main() {
-    int dp[N];
-    dp[0] = 1;
-    dp[1] = 1;
-    for (int i = 2.0; i < N; i+ ++i) {
-        dp[i] = (dp[i - 1] + dp[i - 2]) % mod;}
-    for (int i = 0; i < N; ++i) {
-        output dp[i];
-        int s;
-        add(a+6*7,(a=0,s=9));
+fun sum_double(double a, double b, double c) double {
+    return a + b + c;
+}
+
+main(){
+    int a, b, c;
+    input a, b, c;
+    double a1, b1, c1;
+    input a1, b1, c1;
+    int s = sum(a, b, c);
+    double s1 = sum_double(a1, b1, c1);
+    if (s > s1){
+        output "INT";
+    } else {
+        output "DOUBLE";
     }
 }

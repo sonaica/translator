@@ -1,3 +1,4 @@
+#pragma once
 #include "RuntimeError.hpp"
 
 void RuntimeError::what() { std::cerr << ErrorText_; }
@@ -31,12 +32,6 @@ InvalidOutputOperandError::InvalidOutputOperandError()
 
 InvalidOutputOperandError::~InvalidOutputOperandError() = default;
 
-AssignmentToRvalueError::AssignmentToRvalueError()
-    : RuntimeError("Runtime error: can't assign value to an rvalue") {}
-
-AssignmentToRvalueError::~AssignmentToRvalueError() = default;
-
-CrementOnBoolError::CrementOnBoolError()
-    : RuntimeError("Runtime error : can't increment or decrement a boolean value") {}
-
-CrementOnBoolError::~CrementOnBoolError() = default;
+TooManyElementsForArray::TooManyElementsForArray(const std::string& arr_name) 
+    : RuntimeError("Runtime error: too many elements are defined for array" + arr_name) {}
+TooManyElementsForArray::~TooManyElementsForArray() = default;
