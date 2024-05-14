@@ -8,38 +8,6 @@
 #include "global_tids.hpp"
 #include "uni_ptr.cpp"
 
-/*
-vector<str> st;
-
-struct str {
-    void* mem_adr = nullptr;
-    map<string, int> mp;
-    void* get(string str) {
-        string tp = get_type(str);
-
-        return (mem_adr + mp[str]);
-    }
-}
-
-// start..start + len;
-*/
-/*
-a1.a2.a3.a4
-
-a1
-
-. - p1 p2 -> p1.p2
-(p1)`p2.
-
-sz
-mem; mem + sz -> mem + pos; mem + pos + len(a2)
-
-pos
-*/
-
-//**
-Хранит элементы стека стеков для обработки полиза
-*//
 struct value {
     std::string tp;
     std::string utillity;
@@ -149,7 +117,6 @@ void make_rvalue(value& val) {
     val.is_var_ = false;
 }
 
-// Функция, которая возвращает "доминирующий" тип данных
 string get_dom_type(const value& a, const value& b) {
     if (a.tp == "double" || b.tp == "double") return "double";
     return "int";
@@ -164,9 +131,6 @@ value cast_to_type(value val, std::string tp) {
 std::vector<std::vector<value>> value_stack;
 std::vector<value> main_match_terms;
 
-//**
-Словарь, сопоставляющий бинарную операцию и соответствующую функцию
-*//
 std::map<std::string, std::function<value(value, value)>> binary_rvalue_operations = {
     {"+", [](value a, value b) -> value { return value(get_dom_type(a, b), (get_dom_type(a, b) == "double") 
         ? a.cast_to<double>() + b.cast_to<double>() : a.cast_to<int>() + b.cast_to<int>()); }},
@@ -265,9 +229,6 @@ T pop_from_stack(const std::string& tp) {
     return result;
 }
 
-//**
-написать
-*//
 std::pair<bool, std::pair<std::string, std::string>> analize_util(const std::string& st) {
     if (st.size() < 4 || st.substr(0, 4) != "util")
         return {false, {}};
@@ -292,12 +253,7 @@ std::vector<char> special_symbols = {
     '\"', '\\', 'n'
 };
 
-// Пробегает через полиз пока не уткнётся в return/end_of_function/конец полиза, основная функция исполнения
-// run_from - номер начального элемента для обработки
-// function_name - имя обрабатываемой функции
-// vals - список аргументов для функции
-// str - структура, которой принадлежит функция (если есть)
-// str_mem - блок памяти для этой структуры
+// Пробегает через полиз пока не уткнётся в return/end_of_function/конец полиза
 void Run(std::size_t run_from, const std::string& function_name, 
         std::vector<value> vals = std::vector<value>(), std::string str = NOT_A_STRUCT, cool_byte* str_mem = nullptr) {
     value_stack.push_back({});
@@ -414,6 +370,7 @@ void Run(std::size_t run_from, const std::string& function_name,
                         value to_add(cur_element.maker);
                         to_add.tp += "_" + used_struct.tp + "_" + used_struct.utillity;
                         to_add.ptr.ptr = used_struct.ptr.ptr;
+                        //to_add.fun_ptr = StrTIDS.getFunction(used_struct.tp, struct_member.utillity);
                     }
                 } else if (cur_element.maker == "()") {
                     std::vector<value> vals;
@@ -578,11 +535,14 @@ void Run(std::size_t run_from, const std::string& function_name,
                 if (elems.size() > arr_sz.get_int_val()) {
                     throw TooManyElementsForArray(arr_name.utillity);
                 }
+                std::string tp = get_array_type(arr_tp.utillity);
+                std::cout << "!" << arr_sz.get_int_val() << "\n";
                 IdTIDS.cur_tid()->push_id({arr_tp.utillity, arr_name.utillity}, StrTIDS, arr_sz.get_int_val());
-                cool_byte* ptr = IdTIDS.cur_tid()->find_id(arr_name.utillity);
-                for (size_t ind = 0, tp_size = get_type_size(arr_tp.utillity, StrTIDS);
+                cool_byte*& ptr = IdTIDS.cur_tid()->find_id(arr_name.utillity);
+                for (size_t ind = 0, tp_size = get_type_size(tp, StrTIDS);
                      ind < elems.size(); ++ind) {
-                    std::memcpy(ptr + ind * tp_size, elems[ind].ptr.ptr, tp_size);
+                    std::memcpy(ptr + ind * tp_size, elems[ind].ptr.ptr, tp_size * sizeof(cool_byte));
+
                 }
                 break;
             }

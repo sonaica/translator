@@ -9,9 +9,12 @@ class StructTIDS;
 class IdentifierTIDS;
 class FunctionTIDS;
 
-//**
-Стуктура, обозначающая переменную в формате тип-имя
-*//
+struct MemoryBlock {
+    cool_byte* data;
+    MemoryBlock(size_t cool_byte_data = 0);
+    ~MemoryBlock();
+};
+
 struct Value {
     std::string type_;
     std::string name_;
@@ -34,9 +37,6 @@ size_t get_type_size(const std::string& str, StructTIDS& StrTIDS);
 
 bool duplicates(Value& first, Value& second);
 
-//**
-Тиды идентификаторов
-*//
 class IdentifierTIDS {
    public:
     struct element {
@@ -50,18 +50,17 @@ class IdentifierTIDS {
         ~element();
 
         element(element* parent = nullptr);
-        // добавляет переменную в тид, cnt != 1, если переменная - массив
+
         void push_id(const Value& Variable, StructTIDS& StrTIDS, int cnt = 1);
 
-        // возвращает, есть ли этот элемент в тиде. не кидает ошибку, если его нет
         bool check_id_safe(const std::string& VariableName);
-        // возвращает тип переменной
+
         std::string check_id(const std::string& VariableName);
-        // возвращает блок памяти,принадлежащий этой переменной
+
         cool_byte*& find_id(const std::string& VariableName);
-        // метод для структур, возвращает позицию в блоке памяти, которую занимает переменная VariableName в идентификационном тиде структуры 
+
         size_t get_pointer_jump(const std::string& VariableName, StructTIDS& StrTIDS);
-        // показывает содержимое тида
+
         void __output_elem() const;
     };
 
@@ -81,7 +80,6 @@ class IdentifierTIDS {
     element* cur_tid_;
 };
 
-// структура содержит информацию о конкретной функции с данными параметрами
 struct Function {
     StringSet<int> name_set;
 
@@ -103,15 +101,14 @@ struct Function {
     void set_poliz_pos(const size_t& new_pos);
 
     std::vector<Value>& argument_list();
-    // проверяет соответствие параметра функции под номером par_num и type
+
     void check_func_par(int par_num, const std::string& type);
-    
+
     void check_param_count(const int& have_params);
 };
 
 bool duplicates(Function& F1, Function F2);
 
-// класс, описывающий тид для функций
 class FunctionTIDS {
    public:
     FunctionTIDS();
@@ -129,7 +126,7 @@ class FunctionTIDS {
 
     void push_func_return_type(const std::string& func_name,
                                const std::string& return_type);
-    // для функции func_name установить начало полиза, равное pos
+
     void push_func_poliz_pos(const std::string& func_name,
                              const std::size_t& pos);
 
@@ -137,7 +134,7 @@ class FunctionTIDS {
                            const int& have_params);
 
     void check_exist_id(const std::string& func_name);
-    // возвращает указатель на объект функции
+
     Function* getFunction(const std::string& func_name);
 
    private:
@@ -195,7 +192,7 @@ class StructTIDS {
 
     size_t get_func_poliz(const std::string& struct_name,
                           const std::string& func_name);
-    
+
     size_t get_struct_size(const std::string& struct_name);
 
     Function* getFunction(const std::string& struct_name,

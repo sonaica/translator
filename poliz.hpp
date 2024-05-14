@@ -7,30 +7,6 @@ using std::vector;
 using std::string;
 using std::map;
 
-map<string, int> priority = {
-    {"[]", 0}, {".", 0},
-    {"++", 1}, {"--", 1}, {"-u", 1}, {"+u", 1}, {"~", 1},
-    {"**", 2},
-    {"*", 3}, {"/", 3}, {"%", 3},
-    {"+", 4}, {"-", 4},
-    {"<<", 5}, {">>", 5},
-    {"<", 6}, {">", 6}, {"<=", 6}, {">=", 6},
-    {"==", 7}, {"!=", 7},
-    {"&", 8}, {"and", 8},
-    {"^", 9},
-    {"|", 10}, {"or", 10},
-    {"=", 11}, {"<<=", 11}, {">>=", 11}, {"+=", 11}, {"-=", 11}, {"*=", 11},
-    {"**=", 11}, {"/=", 11}, {"//=", 11}, {"^=", 11}, {"&=", 11}, {"|=", 11},
-    {"%=", 11},
-    {"input", 12}, {"output", 12},
-    {",", 13},
-};
-
-vector<string> associativity[2] = {
-    {"&=", "**", "**=", "*=", "++", "+=", "+u", "--", "-=", "-u", "//=", "/=", "<<=", "=", ">>=", "^=", "input", "output", "|=", "~"},
-    {"!=", "%", "&", "*", "+", "-", ".", "/", "<", "<<", "<=", "==", ">", ">=", ">>", "[]", "^", "and", "or", "|"}
-};
-
 enum ELEMENT_TYPE {
     LITERAL_OPERAND,
     OPERAND,
@@ -109,18 +85,8 @@ ASSOCIATIVITY_TYPE get_associativity(const string& maker);
 
 void push_poliz(poliz_element new_element);
 
-void push_stack(poliz_element new_element);
-
 void pop_stack();
-
-void unconditional_move(int& ptr, int to);
-
-void move_if_false(int& ptr, int to, bool pred);
-
-void move_if_true(int& ptr, int to, bool pred);
 
 size_t cur_ptr();
 
 void poliz_blank();
-
-void PushRemainingOperators();

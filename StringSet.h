@@ -2,9 +2,6 @@
 #include <vector>
 #include <string>
 
-//**
-Словарь, хранящий данные в формате ключ-значение, где ключ типа string
-*//
 template<class T>
 class StringSet {
     

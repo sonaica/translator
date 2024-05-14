@@ -1,4 +1,5 @@
 fun sum(int a, int b, int c) int {
+    sum(1, 2, 3);
     return a + b + c;
 }
 

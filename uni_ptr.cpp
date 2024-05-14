@@ -2,11 +2,8 @@
 
 typedef int64_t cool_byte;
 
-// универсальный указатель на тип данных
 struct uni_ptr {
-    // указатель на блок памяти
     cool_byte* ptr = nullptr;
-// способность/неспособность удалять память, лежащую по указателю ptr
     bool deleteable = false;
 
     uni_ptr() {
@@ -27,7 +24,6 @@ struct uni_ptr {
             ptr = nullptr;
         }
     }
-    // 
     void switch_deleteable() {
         deleteable ^= 1;
     }

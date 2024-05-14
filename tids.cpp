@@ -25,6 +25,7 @@ size_t get_type_size(const std::string &str, StructTIDS& StrTIDS)
 {
     if (str == "int" || str == "double" || str == "bool")
         return 1;
+
     return StrTIDS.get_struct_size(str);
 }
 
@@ -411,3 +412,15 @@ std::string Value::get_type() { return type_; }
 void Function::set_name(const std::string& name) { name_ = name; }
 
 void Function::set_return_type(const std::string& type) { return_type_ = type; }
+
+MemoryBlock::MemoryBlock(size_t cool_byte_data) {
+    if (cool_byte_data == 0)
+        data = nullptr;
+    else
+        data = new cool_byte[cool_byte_data];
+}
+
+MemoryBlock::~MemoryBlock()
+{
+    delete[] data;
+}
