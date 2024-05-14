@@ -37,6 +37,9 @@ mem; mem + sz -> mem + pos; mem + pos + len(a2)
 pos
 */
 
+//**
+Хранит элементы стека стеков для обработки полиза
+*//
 struct value {
     std::string tp;
     std::string utillity;
@@ -146,6 +149,7 @@ void make_rvalue(value& val) {
     val.is_var_ = false;
 }
 
+// Функция, которая возвращает "доминирующий" тип данных
 string get_dom_type(const value& a, const value& b) {
     if (a.tp == "double" || b.tp == "double") return "double";
     return "int";
@@ -160,6 +164,9 @@ value cast_to_type(value val, std::string tp) {
 std::vector<std::vector<value>> value_stack;
 std::vector<value> main_match_terms;
 
+//**
+Словарь, сопоставляющий бинарную операцию и соответствующую функцию
+*//
 std::map<std::string, std::function<value(value, value)>> binary_rvalue_operations = {
     {"+", [](value a, value b) -> value { return value(get_dom_type(a, b), (get_dom_type(a, b) == "double") 
         ? a.cast_to<double>() + b.cast_to<double>() : a.cast_to<int>() + b.cast_to<int>()); }},
@@ -258,6 +265,9 @@ T pop_from_stack(const std::string& tp) {
     return result;
 }
 
+//**
+написать
+*//
 std::pair<bool, std::pair<std::string, std::string>> analize_util(const std::string& st) {
     if (st.size() < 4 || st.substr(0, 4) != "util")
         return {false, {}};
@@ -282,7 +292,12 @@ std::vector<char> special_symbols = {
     '\"', '\\', 'n'
 };
 
-// Пробегает через полиз пока не уткнётся в return/end_of_function/конец полиза
+// Пробегает через полиз пока не уткнётся в return/end_of_function/конец полиза, основная функция исполнения
+// run_from - номер начального элемента для обработки
+// function_name - имя обрабатываемой функции
+// vals - список аргументов для функции
+// str - структура, которой принадлежит функция (если есть)
+// str_mem - блок памяти для этой структуры
 void Run(std::size_t run_from, const std::string& function_name, 
         std::vector<value> vals = std::vector<value>(), std::string str = NOT_A_STRUCT, cool_byte* str_mem = nullptr) {
     value_stack.push_back({});
