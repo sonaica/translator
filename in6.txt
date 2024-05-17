@@ -1,11 +1,9 @@
-int N = 100000;
-
-struct segtree {
-    int t[2 * N];
+struct rra {
+    int t[20000];
     int n;
 
-    fun build(int n_) void {
-        n = n_;
+    fun build() void {
+        input n;
         for (int i = n; i < 2 * n; ++i) {
             input t[i];
         }
@@ -14,35 +12,35 @@ struct segtree {
         }
     }
 
-    fun update(int i, int v) void {
-        i += n;
-        t[i] = v;
-        while (i > 1) {
-            t[i >> 1] = t[i] + t[i ^ 1];
-            i >>= 1;
+    fun show() void {
+        for (int i = 1; i < 2 * n; ++i) {
+            output t[i], " ";
         }
     }
 
     fun get(int l, int r) int {
         l += n;
         r += n;
-        int res = 0;
-        for (; l < r; l >>= 1, r >>= 1) {
-            if (l & 1) {
-                res += t[l + 1];
-                ++l;
-            }
-            if (r & 1) 
-                res += t[--r];
+        int sm = 0;
+        for (int i = l; i < r; ++i) {
+            sm += t[i];
         }
-        return res;
+        return sm;
     }
-} st;
+
+    fun upd(int i, int x) void {
+        i += n;
+        t[i] = x;
+        while (i > 1) {
+            t[i >> 1] = t[i] + t[i ^ 1];
+            i >>= 1;
+        }
+    }
+};
 
 main() {
-    int len;
-    input len;
-    st.build(len);
+    rra b;
+    b.build();
     int q;
     input q;
     for (int i = 0; i < q; ++i) {
@@ -52,12 +50,12 @@ main() {
             int l, r;
             input l, r;
             --l;
-            output st.get(l, r), "\n";
-        } else {
-            int j, x;
-            input j, x;
-            --j;
-            st.update(j, x);
+            output b.get(l, r), "\n";
+        } else if (t == 2) {
+            int i, x;
+            input i, x;
+            --i;
+            b.upd(i, x);
         }
     }
 }

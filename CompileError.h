@@ -350,3 +350,10 @@ class InvalidComparison : public CompileError {
 
     virtual ~InvalidComparison();
 };
+
+class IONonBasicTypeError : public CompileError {
+  public:
+    IONonBasicTypeError();
+
+    virtual ~IONonBasicTypeError();
+};

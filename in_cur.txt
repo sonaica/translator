@@ -1,4 +1,61 @@
+struct rra {
+    int t[20000];
+    int n;
+
+    fun build() void {
+        input n;
+        for (int i = n; i < 2 * n; ++i) {
+            input t[i];
+        }
+        for (int i = n - 1; i > 0; --i) {
+            t[i] = t[i << 1] + t[i << 1 | 1];
+        }
+    }
+
+    fun show() void {
+        for (int i = 1; i < 2 * n; ++i) {
+            output t[i], " ";
+        }
+    }
+
+    fun get(int l, int r) int {
+        l += n;
+        r += n;
+        int sm = 0;
+        for (int i = l; i < r; ++i) {
+            sm += t[i];
+        }
+        return sm;
+    }
+
+    fun upd(int i, int x) void {
+        i += n;
+        t[i] = x;
+        while (i > 1) {
+            t[i >> 1] = t[i] + t[i ^ 1];
+            i >>= 1;
+        }
+    }
+};
+
 main() {
-    int a[10 + 7 - 6] = {1, 3, 5, 7, 9, 11, 13};
-    output a[0];
+    rra b;
+    b.build();
+    int q;
+    input q;
+    for (int i = 0; i < q; ++i) {
+        int t;
+        input t;
+        if (t == 1) {
+            int l, r;
+            input l, r;
+            --l;
+            output b.get(l, r), "\n";
+        } else if (t == 2) {
+            int i, x;
+            input i, x;
+            --i;
+            b.upd(i, x);
+        }
+    }
 }

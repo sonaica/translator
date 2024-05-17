@@ -40,13 +40,12 @@ int main(int argc, char* argv[]) {
     try {
         GetLexem();
         size_t start = Program();
-
         try {
             if (argv[1][0] - '0' == 0) {
                 std::cout << "MAIN START: " << start << "\n";
                 print_poliz();
             }
-            else Run(start, "main");
+            else Run(start);
         } catch (RuntimeError& e) {
             e.what();
             return 1;

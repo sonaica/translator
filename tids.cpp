@@ -23,8 +23,11 @@ bool Value::operator==(const Value& other) const {
 
 size_t get_type_size(const std::string &str, StructTIDS& StrTIDS)
 {
-    if (str == "int" || str == "double" || str == "bool")
-        return 1;
+    if (str == "int" || str == "double")
+        return sizeof(int64_t) / sizeof(cool_byte);
+    if (str == "bool")
+        return sizeof(cool_byte);
+
     return StrTIDS.get_struct_size(str);
 }
 
@@ -47,6 +50,7 @@ void IdentifierTIDS::element::push_id(const Value& Value, StructTIDS& StrTIDS, i
         throw IdentifierAlreadyDefined(Value.name());
     variables_.push_back(Value);
     name_set.insert(Value.name_, Value.type_);
+    name_move.insert(Value.name_, block_size);
     if (is_array(Value.type())) {
         size_t added_size = get_type_size(get_array_type(Value.type()), StrTIDS);
         adr_name_set.insert(Value.name_, new cool_byte[added_size * cnt]);
@@ -77,9 +81,9 @@ std::string IdentifierTIDS::element::check_id(const std::string& VariableName) {
     return find_result.second;
 }
 
-cool_byte*& IdentifierTIDS::element::find_id(const std::string &VariableName)
+cool_byte* IdentifierTIDS::element::find_id(const std::string &VariableName)
 {
-    std::pair<bool, cool_byte*&> find_result = adr_name_set.find(VariableName);
+    std::pair<bool, cool_byte*> find_result = adr_name_set.find(VariableName);
     if (!find_result.first) {
         if (parent_ == nullptr) throw UndefinedVariable(VariableName);
         return parent_->find_id(VariableName);
@@ -93,13 +97,7 @@ size_t IdentifierTIDS::element::get_pointer_jump(const std::string &VariableName
         if (parent_ != nullptr) return parent_->get_pointer_jump(VariableName, StrTIDS);
         throw UndefinedVariable(VariableName);
     }
-    size_t pointer_jump = 0;
-    for (auto& v : variables_) {
-        if (v.name() != VariableName) {
-            pointer_jump += get_type_size(v.type(), StrTIDS);
-        }
-    }
-    return pointer_jump;
+    return name_move.find(VariableName).second;
 }
 
 void IdentifierTIDS::element::__output_elem() const
@@ -112,7 +110,7 @@ void IdentifierTIDS::element::__output_elem() const
 }
 
 IdentifierTIDS::IdentifierTIDS()
-    : cur_tid_(new IdentifierTIDS::element(nullptr)) {}
+    : cur_tid_(new element(nullptr)) {}
 
 IdentifierTIDS::element*& IdentifierTIDS::cur_tid() { return cur_tid_; }
 
@@ -234,6 +232,8 @@ void FunctionTIDS::check_exist_id(const std::string& name) {
 
 Function* FunctionTIDS::getFunction(const std::string &name)
 {
+    std::pair<bool, Function&> find_result = name_set.find(name);
+    if (!find_result.first) throw UndefinedFunction(name);
     return &name_set.find(name).second;
 }
 
@@ -266,11 +266,11 @@ void FunctionTIDS::push_func_par(const std::string& func_name,
 StructTIDS::StructTIDS() {}
 
 void StructTIDS::push_id(const std::string& struct_name,
-                         const Value& variable) {
+                         const Value& variable, int cnt) {
     std::pair<bool, std::pair<FunctionTIDS, IdentifierTIDS>&> find_res =
         name_set.find(struct_name);
     if (!find_res.first) throw UndefinedStruct(struct_name);
-    find_res.second.second.cur_tid()->push_id(variable, *this);
+    find_res.second.second.cur_tid()->push_id(variable, *this, cnt);
 }
 
 bool StructTIDS::check_struct_existance(const std::string &struct_name)

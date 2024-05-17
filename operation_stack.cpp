@@ -66,6 +66,11 @@ void identify_as_function(stack_element &f)
     if (f.el_type != IDENTIFIER_S)
         return;
     f.el_type = FUNCTION_S;
+    if (StrTIDS.check_func_id_safe(struct_in_creation, f.content)) {
+        f.func_ptr = StrTIDS.getFunction(struct_in_creation, f.content);
+        return;
+    }
+    FunTIDS.check_func_id(f.content);
     f.func_ptr = FunTIDS.getFunction(f.content);
 }
 
@@ -81,8 +86,10 @@ void push_poliz_stack(const stack_element &s)
             poliz[s.poliz_pos] = {ELEMENT_TYPE::LITERAL_OPERAND, std::to_string(literal_bool_type) + "_" + s.content};
         else if (s.type_info == "int")
             poliz[s.poliz_pos] = {ELEMENT_TYPE::LITERAL_OPERAND, std::to_string(literal_int_type) + "_" + s.content};
-        else
+        else if (s.type_info == "double")
             poliz[s.poliz_pos] = {ELEMENT_TYPE::LITERAL_OPERAND, std::to_string(literal_double_type) + "_" + s.content};
+        else
+            poliz[s.poliz_pos] = {ELEMENT_TYPE::LITERAL_OPERAND, std::to_string(string_literal_type) + "_" + s.content};
         break;
     case LVALUE_S:
         if (!s.in_poliz)
@@ -260,7 +267,8 @@ void check_member_access()
     push_poliz_stack(oper);
     if (StrTIDS.check_id_safe(left.type_info, right.content)) {
         push_opstack({STACK_ELEMENT_TYPE::LVALUE_S, StrTIDS.check_id(left.type_info, right.content), "", false});
-    } else if (StrTIDS.check_func_id_safe(left.type_info, right.content)) {
+    } else {
+        StrTIDS.check_func_id(left.type_info, right.content);
         stack_element el(FUNCTION_S, "", "", false);
         el.func_ptr = StrTIDS.getFunction(left.type_info, right.content);
         push_opstack(el);
@@ -311,10 +319,29 @@ void check_input()
         if (cur.el_type != LVALUE_S) {
             throw InputNonLvalueObjectError();
         }
+        if (!is_basic_type(cur.type_info)) {
+            throw IONonBasicTypeError();
+        }
     }
     push_poliz(poliz_element(LITERAL_OPERAND, std::to_string(literal_int_type) + "_" + 
                                                 std::to_string(cnt_ops)));
     push_poliz(poliz_element(ELEMENT_TYPE::OPERATOR, "input"));
+}
+
+void check_output()
+{
+    size_t cnt_ops = 0;
+    for (stack_element cur = pop_opstack(); cur.el_type != OUTPUT_END_S; cur = pop_opstack()) {
+        identify_as_lvalue(cur);
+        ++cnt_ops;
+        push_poliz_stack(cur);
+        if (!is_basic_type(cur.type_info) && cur.type_info != "string_literal") {
+            throw IONonBasicTypeError(); 
+        }
+    }
+    push_poliz(poliz_element(ELEMENT_TYPE::LITERAL_OPERAND, std::to_string(literal_int_type) + "_" + 
+                                                std::to_string(cnt_ops)));
+    push_poliz(poliz_element(ELEMENT_TYPE::OPERATOR, "output"));
 }
 
 void check_left()

@@ -39,7 +39,6 @@ void StructDefinition();
 void String();
 void Symbol(char symbol);
 std::string Name();
-void Variable();
 bool Letter(char c);
 bool SpecialSymbol(char c);
 bool Digit(char c);
@@ -57,13 +56,12 @@ bool VariableCreation(std::string str = NOT_A_STRUCT);
 
 // Expression
 
-void Expression(bool need_to_check_left = true);
-void ExpressionTerm(bool need_to_check_left = true);
+void Expression();
+void ExpressionTerm();
 
 // Arithmetic, logic, comparison and assignment
 
 void ArithmeticExpression();
-void UnclearedOperands();
 bool FunctionCall();
 bool ArrayAccess();
 bool MemberAccess();

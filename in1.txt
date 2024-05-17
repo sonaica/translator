@@ -1,22 +1,19 @@
-fun div(int n, int m) int {
+fun div(int n) void {
     int i = 2;
-    int cnt = 0;
     while (i * i <= n){
-        if (n % i == 0) {
-            output i, " ";
-            cnt += 1;
-            if (cnt == m) {
-                return cnt;
+        if (n % i == 0){
+            output i;
+            if (n / i != i) {
+                output n / i;
             }
         }
         ++i;
     }
-    return m;
 }
 
 
 main(){
     int n;
     input n;
-    div(n, div(256, 3));
+    div(n);
 }

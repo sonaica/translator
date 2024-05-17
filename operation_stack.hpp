@@ -54,6 +54,7 @@ void check_member_access();
 void check_uno();
 void check_assignment();
 void check_input();
+void check_output();
 void check_left();
 
 void eq_bool();

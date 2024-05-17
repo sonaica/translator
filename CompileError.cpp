@@ -283,3 +283,6 @@ InvalidArraySize::~InvalidArraySize() = default;
 
 InvalidComparison::InvalidComparison() : CompileError("Compile time error: can't compare non-basic types") {}
 InvalidComparison::~InvalidComparison() = default;
+
+IONonBasicTypeError::IONonBasicTypeError() : CompileError("Compile time error: can't input non-basic type") {}
+IONonBasicTypeError::~IONonBasicTypeError() = default;

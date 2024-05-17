@@ -1,15 +1,10 @@
 #pragma once
 #include <string>
 
-//**
-В этом файле описаны функции, общие для нескольких файлов. 
-*//
-
 bool is_basic_type(const std::string &s)
 {
     return s == "int" || s == "double" || s == "bool";
 }
-
 
 std::string get_array_type(const std::string &s)
 {

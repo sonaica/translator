@@ -1,35 +1,24 @@
-int MAXN = 1000;
-int n;
-struct g_info {
-    bool to[MAXN];
-};
+struct arr {
+    int a[100];
+    int n;
 
-g_info g[MAXN];
-bool used[MAXN];
-
-fun dfs(int v) void {
-    used[v] = true;
-    output v, " ";
-    for (int u = 0; u < n; ++u) {
-        if (g[v].to[u] & ~used[u]) {
-            dfs(u);
+    fun inp() void {
+        input n;
+        for (int i = 0; i < n; ++i) {
+            input a[i];
         }
     }
-}
+
+    fun get(int l, int r) int {
+        int sm = 0;
+        for (int i = l; i <= r; ++i) {
+            sm += a[i];
+        }
+        return sm;
+    }
+} b;
 
 main() {
-    input n;
-    for (int i = 0; i < n; ++i) {
-        used[i] = false;
-    }
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j) {
-            input g[i].to[j];
-        }
-    }
-    for (int i = 0; i < n; ++i) {
-        if (~used[i]) {
-            dfs(i);
-        }
-    }
+    b.inp();
+    output b.get(1, 2);
 }

@@ -127,7 +127,7 @@
 ```
 ### Cycles
 ```
-<For>::= for "("(<Variable Initialization>); <Expression>; <Expression>")" <Operator>
+<For>::= for "("(<Variable Initialization>); (<Expression>); (<Expression>)")" <Operator>
 
 <While>::= while "(" <Expression> ")" <Operator>
 ```
@@ -143,7 +143,7 @@
 ```
 <Array declaration>::= <Array declaration exact> | <Array declaration auto>
 
-<Array declaration exact> ::= <Type> <Name>”[“<Expression>”]” [ = “{“ <Expression> "}"];
+<Array declaration exact> ::= <Type> <Name>”[“<Literal>”]” [ = “{“ <Expression> "}"];
 
 <Array declaration auto> ::= <Type> <Name> “[]” = “{“ <Expression> "}";
 

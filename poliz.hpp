@@ -7,30 +7,6 @@ using std::vector;
 using std::string;
 using std::map;
 
-map<string, int> priority = {
-    {"[]", 0}, {".", 0},
-    {"++", 1}, {"--", 1}, {"-u", 1}, {"+u", 1}, {"~", 1},
-    {"**", 2},
-    {"*", 3}, {"/", 3}, {"%", 3},
-    {"+", 4}, {"-", 4},
-    {"<<", 5}, {">>", 5},
-    {"<", 6}, {">", 6}, {"<=", 6}, {">=", 6},
-    {"==", 7}, {"!=", 7},
-    {"&", 8}, {"and", 8},
-    {"^", 9},
-    {"|", 10}, {"or", 10},
-    {"=", 11}, {"<<=", 11}, {">>=", 11}, {"+=", 11}, {"-=", 11}, {"*=", 11},
-    {"**=", 11}, {"/=", 11}, {"//=", 11}, {"^=", 11}, {"&=", 11}, {"|=", 11},
-    {"%=", 11},
-    {"input", 12}, {"output", 12},
-    {",", 13},
-};
-
-vector<string> associativity[2] = {
-    {"&=", "**", "**=", "*=", "++", "+=", "+u", "--", "-=", "-u", "//=", "/=", "<<=", "=", ">>=", "^=", "input", "output", "|=", "~"},
-    {"!=", "%", "&", "*", "+", "-", ".", "/", "<", "<<", "<=", "==", ">", ">=", ">>", "[]", "^", "and", "or", "|"}
-};
-
 enum ELEMENT_TYPE {
     LITERAL_OPERAND,
     OPERAND,
@@ -55,7 +31,8 @@ enum ELEMENT_TYPE {
     DELETE_TID,
     CLEAR_STACK,
     STOP_CLEARING_STACK,
-    STRUCT_MEMBER
+    STRUCT_MEMBER,
+    DELETE_MATCH_MAIN_TERM
 };
 
 std::map<ELEMENT_TYPE, std::string> element_type_translation = {
@@ -81,13 +58,10 @@ std::map<ELEMENT_TYPE, std::string> element_type_translation = {
     {ELEMENT_TYPE::CREATE_TID, "CREATE_NEW_TID"},
     {ELEMENT_TYPE::DELETE_TID, "DELETE_CURRENT_TID"},
     {ELEMENT_TYPE::CLEAR_STACK, "CLEAR_STACK"},
-    {ELEMENT_TYPE::STRUCT_MEMBER, "STRUCT_MEMBER"}
+    {ELEMENT_TYPE::STRUCT_MEMBER, "STRUCT_MEMBER"},
+    {ELEMENT_TYPE::DELETE_MATCH_MAIN_TERM, "DELETE_MATCH_MAIN_TERM"}
 };
 
-enum ASSOCIATIVITY_TYPE {
-    RIGHT,
-    LEFT
-};
 
 struct poliz_element;
 
@@ -103,24 +77,9 @@ struct poliz_element {
 
 
 vector<poliz_element> poliz;
-vector<poliz_element> poliz_stack;
-
-ASSOCIATIVITY_TYPE get_associativity(const string& maker);
 
 void push_poliz(poliz_element new_element);
-
-void push_stack(poliz_element new_element);
-
-void pop_stack();
-
-void unconditional_move(int& ptr, int to);
-
-void move_if_false(int& ptr, int to, bool pred);
-
-void move_if_true(int& ptr, int to, bool pred);
 
 size_t cur_ptr();
 
 void poliz_blank();
-
-void PushRemainingOperators();

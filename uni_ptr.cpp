@@ -1,36 +1,19 @@
 #pragma once
 
-typedef int64_t cool_byte;
+typedef char cool_byte;
 
-// универсальный указатель на тип данных
 struct uni_ptr {
-    // указатель на блок памяти
     cool_byte* ptr = nullptr;
-// способность/неспособность удалять память, лежащую по указателю ptr
-    bool deleteable = false;
 
     uni_ptr() {
         ptr = nullptr;
     }
-    void create() {
-        ptr = new cool_byte;
+    void create(size_t sz) {
+        if (ptr != nullptr)
+            delete[] ptr;
+        ptr = new cool_byte[sz];
     }
-    uni_ptr(bool deleteable_) {
-        if (deleteable) {
-            ptr = new cool_byte;
-        }
-        deleteable = deleteable_;
-    }
-    ~uni_ptr() {
-        if (deleteable) {
-            delete ptr;
-            ptr = nullptr;
-        }
-    }
-    // 
-    void switch_deleteable() {
-        deleteable ^= 1;
-    }
+    ~uni_ptr() {}
     int64_t* int_ptr() const {
         return (int64_t*)ptr;
     }
@@ -56,7 +39,6 @@ struct uni_ptr {
     void swap(uni_ptr& other) {
         using std::swap;
         swap(ptr, other.ptr);
-        swap(deleteable, other.deleteable);
     }
 
     uni_ptr& operator=(uni_ptr other) {

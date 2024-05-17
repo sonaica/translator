@@ -8,85 +8,66 @@
 #include "global_tids.hpp"
 #include "uni_ptr.cpp"
 
-/*
-vector<str> st;
+struct func_info {
+    Function* func_ptr = nullptr;
+    std::string str_tp = NOT_A_TYPE;
+    cool_byte* str_mem = nullptr;
+};
 
-struct str {
-    void* mem_adr = nullptr;
-    map<string, int> mp;
-    void* get(string str) {
-        string tp = get_type(str);
-
-        return (mem_adr + mp[str]);
-    }
-}
-
-// start..start + len;
-*/
-/*
-a1.a2.a3.a4
-
-a1
-
-. - p1 p2 -> p1.p2
-(p1)`p2.
-
-sz
-mem; mem + sz -> mem + pos; mem + pos + len(a2)
-
-pos
-*/
-
-//**
-Хранит элементы стека стеков для обработки полиза
-*//
 struct value {
     std::string tp;
-    std::string utillity;
+    std::string name;
+    bool is_value_ = true;
     bool is_var_ = false;
     uni_ptr ptr;
+    func_info fun_info;
 
     bool is_var() const {
         return is_var_;
+    }
+
+    bool is_value() const {
+        return is_value_;
     }
 
     value() {
         tp = "undefined";
     }
 
+    ~value() {}
+
     value(const std::string& tmp) {
-        utillity = tmp;
+        name = tmp;
+        is_value_ = false;
         tp = "util";
     }
 
     template<class T>
     value(const std::string& typ, T val) {
         tp = typ;
-        ptr.create();
+        ptr.create(get_type_size(typ, StrTIDS));
         if (tp == "int") ptr.get_int() = val;
         if (tp == "double") ptr.get_double() = val;
         if (tp == "bool") ptr.get_bool() = val;
     }
 
     value(int64_t val) {
-        ptr.create();
+        ptr.create(get_type_size("int", StrTIDS));
         ptr.get_int() = val;
         tp = "int";
     }
 
     value(double val) {
-        ptr.create();
+        ptr.create(get_type_size("double", StrTIDS));
         ptr.get_double() = val;
         tp = "double";
     }
 
     value(bool val) {
-        ptr.create();
+        ptr.create(get_type_size("bool", StrTIDS));
         ptr.get_bool() = val;
         tp = "bool";
     }
-
-    ~value() {}
 
     int64_t get_int_val() const {
         return *ptr.int_ptr();
@@ -128,7 +109,7 @@ struct value {
 
     void copy(const value& other) {
         if (ptr.is_null()) {
-            ptr.ptr = new cool_byte;
+            ptr.create(get_type_size(tp, StrTIDS));
         }
         if (tp == "int") get_int_ref() = other.cast_to<int>();
         if (tp == "double") get_double_ref() = other.cast_to<double>();
@@ -145,28 +126,14 @@ struct value {
     }
 };
 
-void make_rvalue(value& val) {
-    val.is_var_ = false;
-}
-
-// Функция, которая возвращает "доминирующий" тип данных
 string get_dom_type(const value& a, const value& b) {
     if (a.tp == "double" || b.tp == "double") return "double";
     return "int";
 }
 
-value cast_to_type(value val, std::string tp) {
-    make_rvalue(val);
-    val.tp = tp;
-    return val;
-}
-
 std::vector<std::vector<value>> value_stack;
 std::vector<value> main_match_terms;
 
-//**
-Словарь, сопоставляющий бинарную операцию и соответствующую функцию
-*//
 std::map<std::string, std::function<value(value, value)>> binary_rvalue_operations = {
     {"+", [](value a, value b) -> value { return value(get_dom_type(a, b), (get_dom_type(a, b) == "double") 
         ? a.cast_to<double>() + b.cast_to<double>() : a.cast_to<int>() + b.cast_to<int>()); }},
@@ -251,23 +218,6 @@ void pop_value_stack_to(value& a) {
     value_stack.back().pop_back();
 }
 
-template<class T>
-T pop_from_stack(const std::string& tp) {
-    value val = value_stack.back().back();
-    T result;
-    if (tp == "int")
-        result = val.get_int_val();
-    else if (tp == "double")
-        result = val.get_double_val();
-    else if (tp == "bool")
-        result = val.get_bool_val();
-    value_stack.back().pop_back();
-    return result;
-}
-
-//**
-написать
-*//
 std::pair<bool, std::pair<std::string, std::string>> analize_util(const std::string& st) {
     if (st.size() < 4 || st.substr(0, 4) != "util")
         return {false, {}};
@@ -292,28 +242,38 @@ std::vector<char> special_symbols = {
     '\"', '\\', 'n'
 };
 
-// Пробегает через полиз пока не уткнётся в return/end_of_function/конец полиза, основная функция исполнения
-// run_from - номер начального элемента для обработки
-// function_name - имя обрабатываемой функции
-// vals - список аргументов для функции
-// str - структура, которой принадлежит функция (если есть)
-// str_mem - блок памяти для этой структуры
-void Run(std::size_t run_from, const std::string& function_name, 
-        std::vector<value> vals = std::vector<value>(), std::string str = NOT_A_STRUCT, cool_byte* str_mem = nullptr) {
+void delete_memory(value& v) {
+    if (!v.is_var()) {
+        delete[] v.ptr.ptr;
+        v.ptr.ptr = nullptr;
+    }
+}
+
+void delete_memory(std::vector<value>& v) {
+    for (value& u : v) {
+        delete_memory(u);
+    }
+}
+
+IdentifierTIDS GlobalIdTID;
+
+// Пробегает через полиз пока не уткнётся в return/end_of_function/конец полиза
+void Run(std::size_t run_from, Function* func_ptr = nullptr, 
+        std::vector<value> vals = std::vector<value>(), std::string str_tp = NOT_A_TYPE, cool_byte* str_mem = nullptr) {
     value_stack.push_back({});
-    if (function_name != "main") {
-        Function* ff = FunTIDS.getFunction(function_name);
-        for (size_t ind = 0; ind < vals.size(); ++ind) {
-            std::string var_name = ff->argument_list()[ind].name();
-            std::string var_type = ff->argument_list()[ind].get_type();
-            IdTIDS.cur_tid()->push_id(Value(var_type, var_name), StrTIDS);
-            cool_byte*& adr = IdTIDS.cur_tid()->find_id(var_name);
-            adr = new cool_byte;
-            *adr = *vals[ind].ptr.ptr;
+    IdentifierTIDS CurIdTIDS;
+    if (func_ptr != nullptr) {
+        CurIdTIDS.create_TID();
+        const std::vector<Value>& arglist = func_ptr->argument_list();
+        for (size_t ind = 0; ind < arglist.size(); ++ind) {
+            const Value& v = arglist[ind];
+            CurIdTIDS.cur_tid()->push_id({v.type(), v.name()}, StrTIDS);
+            cool_byte* mem = CurIdTIDS.cur_tid()->find_id(v.name());
+            std::memcpy(mem, vals[ind].ptr.ptr, get_type_size(vals[ind].tp, StrTIDS) * sizeof(cool_byte));
         }
     }
-    std::size_t cur_pos = run_from;
-    while (cur_pos < poliz.size()) {
+    
+    for (std::size_t cur_pos = run_from; cur_pos < poliz.size();) {
         poliz_element cur_element = poliz[cur_pos++];
         switch (cur_element.type_info) {
             case LITERAL_OPERAND: {
@@ -343,7 +303,6 @@ void Run(std::size_t run_from, const std::string& function_name,
                         break;
                     }
                 }
-                
                 break;
             }
             case OPERAND: {
@@ -395,43 +354,56 @@ void Run(std::size_t run_from, const std::string& function_name,
                     value result;
                     result.tp = needed_type;
                     result.is_var_ = true;
-                    result.ptr.ptr = arr.ptr.ptr + get_type_size(arr.tp, StrTIDS) * ind_elem.get_int_val();
+                    result.ptr.ptr = arr.ptr.ptr + get_type_size(result.tp, StrTIDS) * ind_elem.get_int_val();
                     value_stack.back().push_back(result);
+                    delete_memory(ind_elem);
+                    delete_memory(arr);
                 } else if (cur_element.maker == ".") {
                     value used_struct, struct_member;
                     pop_value_stack_to(struct_member);
                     pop_value_stack_to(used_struct);
-                    if (StrTIDS.check_id_safe(used_struct.tp, struct_member.utillity)) {
+                    if (StrTIDS.check_id_safe(used_struct.tp, struct_member.name)) {
                         // it is a variable
                         value to_add;
-                        to_add.tp = StrTIDS.check_id(used_struct.tp, struct_member.utillity);
+                        to_add.tp = StrTIDS.check_id(used_struct.tp, struct_member.name);
                         to_add.is_var_ = true;
                         to_add.ptr.ptr = used_struct.ptr.ptr + 
-                                StrTIDS.get_pointer_jump(used_struct.tp, struct_member.utillity);
+                                StrTIDS.get_pointer_jump(used_struct.tp, struct_member.name);
                         value_stack.back().push_back(to_add);
                     } else {
                         // it is a function
                         value to_add(cur_element.maker);
-                        to_add.tp += "_" + used_struct.tp + "_" + used_struct.utillity;
-                        to_add.ptr.ptr = used_struct.ptr.ptr;
+                        to_add.tp = "function";
+                        to_add.fun_info.func_ptr = StrTIDS.getFunction(used_struct.tp, struct_member.name);
+                        to_add.fun_info.str_mem = used_struct.ptr.ptr;
+                        to_add.fun_info.str_tp = used_struct.tp;
+                        value_stack.back().push_back(to_add);
                     }
+                    delete_memory(used_struct);
+                    delete_memory(struct_member);
                 } else if (cur_element.maker == "()") {
-                    std::vector<value> vals;
-                    std::pair<bool, std::pair<std::string, std::string>> st;
-                    while (!(st = analize_util(value_stack.back().back().tp)).first) {
-                        vals.push_back(value());
-                        pop_value_stack_to(vals.back());
+                    
+                    std::vector<value> args;
+                    while (value_stack.back().back().tp != "function") {
+                        args.push_back(value_stack.back().back());
+                        value_stack.back().pop_back();
                     }
-                    std::reverse(vals.begin(), vals.end());
-                    Function* f = FunTIDS.getFunction(value_stack.back().back().utillity);
-                    value_stack.back().pop_back();
-                    IdTIDS.create_TID();
-                    Run(f->poliz_pos(), f->name(), vals, st.second.first, IdTIDS.cur_tid()->find_id(st.second.second));
+                    
+                    value func_val;
+                    pop_value_stack_to(func_val);
+                    std::reverse(args.begin(), args.end());
+                    
+                    Run(func_val.fun_info.func_ptr->poliz_pos(), func_val.fun_info.func_ptr,
+                    args, func_val.fun_info.str_tp, func_val.fun_info.str_mem);
+                    
+                    delete_memory(args);
+                    delete_memory(func_val);
                 } else if (cur_element.maker == "input") {
-                    size_t count_operands = pop_from_stack<int64_t>("int");
-                    std::vector<value> vals(count_operands);
+                    value count_operands;
+                    pop_value_stack_to(count_operands);
+                    std::vector<value> vals(count_operands.get_int_val());
                     bool ok = true;
-                    for (int ind = count_operands - 1; ind >= 0; --ind) {
+                    for (int ind = count_operands.get_int_val() - 1; ind >= 0; --ind) {
                         pop_value_stack_to(vals[ind]);
                     }
                     for (value& v : vals) {
@@ -445,11 +417,13 @@ void Run(std::size_t run_from, const std::string& function_name,
                             ok = false;
                         }
                     }
+                    delete_memory(count_operands);
                 } else if (cur_element.maker == "output") {
-                    size_t count_operands = pop_from_stack<int64_t>("int");
-                    std::vector<value> vals(count_operands);
-                    
-                    for (int ind = count_operands - 1; ind >= 0; --ind) {
+                    value count_operands;
+                    pop_value_stack_to(count_operands);
+                    std::vector<value> vals(count_operands.get_int_val());                    
+                    bool ok = true;
+                    for (int ind = count_operands.get_int_val() - 1; ind >= 0; --ind) {
                         pop_value_stack_to(vals[ind]);
                     }
                     for (const value& v : vals) {
@@ -459,9 +433,9 @@ void Run(std::size_t run_from, const std::string& function_name,
                             std::cout << v.get_bool_val();
                         } else if (v.tp == "double") {
                             std::cout << v.get_double_val();
-                        } else if (v.tp == "util") {
+                        } else if (!v.is_value()) {
                             bool note_special = false;
-                            for (char c : v.utillity) {
+                            for (char c : v.name) {
                                 if (c == '\\') {
                                     note_special = true;
                                 } else {
@@ -485,6 +459,8 @@ void Run(std::size_t run_from, const std::string& function_name,
                             }
                         }
                     }
+                    delete_memory(count_operands);
+                    delete_memory(vals);
                 } else if (cur_element.maker == "," || cur_element.maker == ";") {
                     clear_last_value_stack();
                 } else {
@@ -498,40 +474,62 @@ void Run(std::size_t run_from, const std::string& function_name,
                             std::string op = cur_element.maker.substr(0, cur_element.maker.size() - 1);
                             value_stack.back().push_back(arg1.assign(binary_rvalue_operations[op](arg1, arg2)));
                         }
+                        delete_memory(arg2);
                     } else {
                         value_stack.back().push_back(binary_rvalue_operations[cur_element.maker](arg1, arg2));
+                        delete_memory(arg1);
+                        delete_memory(arg2);
                     }
+
                 }
                 break;
             }
             case UNCOND_MOVE: {
-                cur_pos = value_stack.back().back().get_int_ref();
+                value nxt_pos = value_stack.back().back();
+                cur_pos = nxt_pos.get_int_val();
                 value_stack.back().pop_back();
+                delete_memory(nxt_pos);
                 break; 
             }
             case MOVE_BY_FALSE: {
-                int move_to = value_stack.back().back().get_int_ref();
+                value move_to = value_stack.back().back();
                 value_stack.back().pop_back();
-                bool res = value_stack.back().back().cast_to<bool>();
+                value res = value_stack.back().back();
                 value_stack.back().pop_back();
-                if (!res)
-                    cur_pos = move_to;
+                if (!res.cast_to<bool>())
+                    cur_pos = move_to.get_int_val();
+                delete_memory(move_to);
+                delete_memory(res);
                 break;
             }
             case MOVE_BY_TRUE: {
-                int move_to = value_stack.back().back().get_int_ref();
+                value move_to = value_stack.back().back();
                 value_stack.back().pop_back();
-                bool res = value_stack.back().back().cast_to<bool>();
+                value res = value_stack.back().back();
                 value_stack.back().pop_back();
-                if (res)
-                    cur_pos = move_to;
+                if (res.cast_to<bool>())
+                    cur_pos = move_to.get_int_val();
+                delete_memory(move_to);
+                delete_memory(res);
                 break;
             }
             case UNDEFINED: {
                 break;
             }
             case FUNCTION_NAME: {
-                value_stack.back().push_back(value(cur_element.maker));
+                value to_add;
+                to_add.tp = "function";
+                if (StrTIDS.check_func_id_safe(str_tp, cur_element.maker)) {
+                    to_add.fun_info.func_ptr = StrTIDS.getFunction(str_tp, cur_element.maker);
+                    to_add.fun_info.str_mem = str_mem;
+                    to_add.fun_info.str_tp = str_tp;
+                    value_stack.back().push_back(to_add);
+                    break;
+                }
+                to_add.fun_info.func_ptr = FunTIDS.getFunction(cur_element.maker);
+                to_add.fun_info.str_mem = nullptr;
+                to_add.fun_info.str_tp = NOT_A_TYPE;
+                value_stack.back().push_back(to_add);
                 break;
             }
             case POSITION: {
@@ -551,11 +549,19 @@ void Run(std::size_t run_from, const std::string& function_name,
                 value_stack.back().push_back(main_match_terms.back());
                 break;
             }
+            case DELETE_MATCH_MAIN_TERM: {
+                value mm = main_match_terms.back();
+                main_match_terms.pop_back();
+                delete_memory(mm);
+                break;
+            }
             case MAKE_VARIABLE: {
                 value tp, name;
                 pop_value_stack_to(name);
                 pop_value_stack_to(tp);
-                IdTIDS.cur_tid()->push_id(Value(tp.utillity, name.utillity), StrTIDS);
+                CurIdTIDS.cur_tid()->push_id(Value(tp.name, name.name), StrTIDS);
+                delete_memory(tp);
+                delete_memory(name);
                 break;
             }
             case MAKE_ARRAY_AUTO: {
@@ -563,11 +569,10 @@ void Run(std::size_t run_from, const std::string& function_name,
                 break;
             }
             case MAKE_ARRAY_EXACT: {
-                
                 value arr_sz, arr_name, arr_tp;
                 std::vector<value> elems;
                 value cur;
-                while (pop_value_stack_to(cur), cur.tp != "util") {
+                while (pop_value_stack_to(cur), cur.is_value()) {
                     elems.push_back(cur);
                 }
                 arr_sz = elems.back();
@@ -576,64 +581,66 @@ void Run(std::size_t run_from, const std::string& function_name,
                 arr_name = cur;
                 pop_value_stack_to(arr_tp);
                 if (elems.size() > arr_sz.get_int_val()) {
-                    throw TooManyElementsForArray(arr_name.utillity);
+                    throw TooManyElementsForArray(arr_name.name);
                 }
-                IdTIDS.cur_tid()->push_id({arr_tp.utillity, arr_name.utillity}, StrTIDS, arr_sz.get_int_val());
-                cool_byte* ptr = IdTIDS.cur_tid()->find_id(arr_name.utillity);
-                for (size_t ind = 0, tp_size = get_type_size(arr_tp.utillity, StrTIDS);
+                CurIdTIDS.cur_tid()->push_id({arr_tp.name + "_array", arr_name.name}, StrTIDS, arr_sz.get_int_val());
+                cool_byte* ptr = CurIdTIDS.cur_tid()->find_id(arr_name.name);
+                for (size_t ind = 0, tp_size = get_type_size(arr_tp.name, StrTIDS);
                      ind < elems.size(); ++ind) {
-                    std::memcpy(ptr + ind * tp_size, elems[ind].ptr.ptr, tp_size);
+                    std::memcpy(ptr + ind * tp_size, elems[ind].ptr.ptr, tp_size * sizeof(cool_byte));
                 }
+                delete_memory(elems);
+                delete_memory(arr_sz);
+                delete_memory(arr_name);
+                delete_memory(arr_tp);
                 break;
             }
             case RETURN_OPERATOR: {
-                
                 value& cv = value_stack.back().back();
                 value new_v = cv;
                 new_v.ptr.ptr = nullptr;
-                new_v.tp = FunTIDS.getFunction(function_name)->return_type();
+                new_v.tp = func_ptr->return_type();
                 new_v.copy(cv);
                 value_stack.pop_back();
                 if (new_v.tp != "void")
                     value_stack.back().push_back(new_v);
-                IdTIDS.del_TID();
+                delete_memory(cv);
                 return;
             }
             case END_OF_FUNCTION: {
-                IdTIDS.del_TID();
                 value_stack.pop_back();
                 return;
             }
             case VARIABLE_OPERAND: {
-                if (IdTIDS.cur_tid()->check_id_safe(cur_element.maker)) {
+                if (CurIdTIDS.cur_tid()->check_id_safe(cur_element.maker)) {
                     value to_add;
-                    to_add.ptr.ptr = IdTIDS.cur_tid()->find_id(cur_element.maker);
-                    to_add.ptr.deleteable = false;
-                    to_add.tp = IdTIDS.cur_tid()->check_id(cur_element.maker);
+                    to_add.ptr.ptr = CurIdTIDS.cur_tid()->find_id(cur_element.maker);
+                    to_add.tp = CurIdTIDS.cur_tid()->check_id(cur_element.maker);
                     to_add.is_var_ = true;
                     value_stack.back().push_back(to_add);
-                } else if (StrTIDS.check_id_safe(str, cur_element.maker)) {
-                    value to_add;
-                    to_add.ptr.ptr = str_mem + StrTIDS.get_pointer_jump(str, cur_element.maker);
-                    to_add.ptr.deleteable = false;
-                    to_add.tp = StrTIDS.check_id(str, cur_element.maker);
-                    to_add.utillity = cur_element.maker;
-                    to_add.is_var_ = true;
-                    value_stack.back().push_back(to_add);
+                    break;
                 }
+                value to_add;
+                to_add.ptr.ptr = str_mem + StrTIDS.get_pointer_jump(str_tp, cur_element.maker);
+                to_add.tp = StrTIDS.check_id(str_tp, cur_element.maker);
+                to_add.is_var_ = true;
+                value_stack.back().push_back(to_add);
                 break;
             }
             case CREATE_TID: {
-                IdTIDS.create_TID();
+                CurIdTIDS.create_TID();
                 break;
             }
             case DELETE_TID: {
-                IdTIDS.del_TID();
+                CurIdTIDS.del_TID();
                 break;
             }
             case CLEAR_STACK: {
-                while (!value_stack.back().empty())
+                while (!value_stack.back().empty()) {
+                    value val = value_stack.back().back();
                     value_stack.back().pop_back();
+                    delete_memory(val);
+                }
                 break;
             }
             case STRUCT_MEMBER: {
