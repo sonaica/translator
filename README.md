@@ -1,5 +1,7 @@
+Programming language
+
 ### Developers:
 
-Gaisina Sofia @ssupersonicc
+Gaisina Sofia @sonaica
 
 Grigoryan Sergey @sir-greg
